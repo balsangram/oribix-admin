@@ -13,7 +13,7 @@ const NAV_GROUPS = [
     {
         label: 'MISSION CONTROL',
         items: [
-            { label: 'Live Ops', icon: LayoutDashboard, to: '/admin/console' },
+            { label: 'Live Ops', icon: LayoutDashboard, to: '/dashboard' },
             { label: 'Order Pipeline', icon: GitBranch, to: '/admin/pipeline' },
             { label: 'Live Map + Replay', icon: Map, to: '/admin/livemap' },
         ],

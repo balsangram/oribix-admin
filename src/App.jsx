@@ -3,17 +3,26 @@ import Login from './pages/Login';
 import ConsoleLayout from './layouts/ConsoleLayout';
 import MissionControl from './pages/MissionControl';
 import ComingSoon from './pages/ComingSoon';
+import VerifyOTP from './pages/VerifyOTP';
+import DashboardView from './pages/dashboard/DashboardView';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/admin/login" replace />} />
-        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
-        <Route path="/admin/login" element={<Login />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
 
         {/* Admin Console — nested under layout */}
-        <Route path="/admin" element={<ConsoleLayout />}>
+        <Route path="/" element={<ConsoleLayout />}>
+
+        {/* dashboard ============================================ */}
+
+        <Route path="dashboard" element={<DashboardView />} />
+
+
+
           <Route path="console" element={<MissionControl />} />
           {/* Placeholder routes for future pages */}
           <Route path="pipeline" element={<ComingSoon />} />
