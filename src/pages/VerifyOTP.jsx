@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 import { M_CARD } from "../components/basicComponents/Card";
@@ -9,12 +9,68 @@ import { BUTTON } from "../components/basicComponents/Button";
 import { L } from "../components/basicComponents/Link";
 import { INPUT, LABEL } from "../components/basicComponents/Form";
 import { IMG } from "../components/basicComponents/Image";
+import { toast } from "../components/basicComponents/TostMessage";
+import { verifyOtp } from "../api/auth";
 
 function VerifyOTP() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleVerify = () => {
-    navigate("/dashboard");
+  const [identifier] = useState(
+    () =>
+      location.state?.identifier ||
+      sessionStorage.getItem("loginIdentifier") ||
+      ""
+  );
+  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!identifier) {
+      toast.error("Please login first to verify OTP.");
+      navigate("/login", { replace: true });
+    }
+  }, [identifier, navigate]);
+
+  const handleVerify = async () => {
+    if (loading) return;
+
+    if (!otp || otp.length !== 6) {
+      toast.error("Please enter the 6-digit OTP.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { data } = await verifyOtp({
+        identifier,
+        otp,
+      });
+
+      const result = data?.data || data;
+      const accessToken = result?.accessToken;
+      const refreshToken = result?.refreshToken;
+      const user = result?.user;
+
+      if (accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+      }
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+      }
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      sessionStorage.removeItem("loginIdentifier");
+      toast.success(result?.message || data?.message || "OTP verified successfully.");
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      toast.error(err.message || "OTP verification failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,7 +104,10 @@ function VerifyOTP() {
             type="text"
             placeholder="Enter 6-digit OTP"
             className="h-12 rounded-xl text-center tracking-[0.4em]"
-            maxLength={6}
+            value={otp}
+            onChange={(e) =>
+              setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+            }
           />
         </div>
 
@@ -57,7 +116,7 @@ function VerifyOTP() {
           onClick={handleVerify}
           className="w-full h-12 rounded-xl font-semibold shadow-[0_0_30px_rgba(47,155,243,0.45)]"
         >
-          Verify & Enter Console
+          {loading ? "Please wait..." : "Verify & Enter Console"}
         </BUTTON>
 
         {/* Back */}

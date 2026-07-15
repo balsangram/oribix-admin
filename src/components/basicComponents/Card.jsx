@@ -1,10 +1,10 @@
 import { ShoppingBag } from "lucide-react";
 
 const cardSize = {
-  big: "w-[900px] min-h-[500px] p-8",
+  big: "w-full min-h-full px-6 py-6",
   medium: "w-[550px] min-auto p-8",
   small: "w-[350px] min-h-[300px] p-6",
-  verySmall: "w-[250px] min-h-[200px] p-4",
+  verySmall: "w-full min-h-[112px] p-5",
 };
 
 
@@ -16,9 +16,16 @@ export function CARD({ children , className = ''}) {
   );
 }
 
-export function B_CARD({ children, className = '' }) {
+export function B_CARD({ children, className = "" }) {
   return (
-    <div className={`cardSize.big  ${className}`}>
+    <div
+      className={`
+        w-full min-h-full
+        px-6 py-6
+        flex flex-col gap-4
+        ${className}
+      `}
+    >
       {children}
     </div>
   );
@@ -34,14 +41,46 @@ export function M_CARD({ children, className = "" }) {
   );
 }
 
-export function S_CARD({ children, className = '' }) {
+export function S_CARD({
+  children,
+  className = "",
+  accentColor = "#22C55E",
+}) {
   return (
-    <div className={`cardSize.small ${className}`}>
+    <div
+      className={`
+        w-full min-h-[300px] p-5
+        bg-white
+        rounded-2xl
+        border border-gray-100
+        shadow-[0_8px_24px_rgba(15,23,42,0.06)]
+        overflow-hidden
+        flex flex-col gap-4
+        ${className}
+      `}
+      style={{ borderTop: `5px solid ${accentColor}` }}
+    >
       {children}
     </div>
   );
 }
 
+export function VS_CARD({ children, className = "" }) {
+  return (
+    <div
+      className={`
+        ${cardSize.verySmall}
+        bg-white
+        rounded-2xl
+        border border-gray-200
+        shadow-[0_1px_2px_rgba(15,23,42,0.04),0_4px_12px_rgba(15,23,42,0.04)]
+        ${className}
+      `}
+    >
+      {children}
+    </div>
+  );
+}
 
 export function D_CARD({
   title,
@@ -73,3 +112,76 @@ export function D_CARD({
     </div>
   );
 }
+
+const HEAT_COLORS = [
+  "#FDF0E6", // 0
+  "#F5C4A8", // 1–2
+  "#E8894A", // 3–6
+  "#D4652A", // 7–14
+  "#8B3A1F", // 15+
+];
+
+export function getHeatColor(orders = 0) {
+  if (orders >= 15) return HEAT_COLORS[4];
+  if (orders >= 7) return HEAT_COLORS[3];
+  if (orders >= 3) return HEAT_COLORS[2];
+  if (orders >= 1) return HEAT_COLORS[1];
+  return HEAT_COLORS[0];
+}
+
+export function Demand_Heat_Card({
+  warehouseName = "Warehouse",
+  address = "",
+  orders = 0,
+  className = "",
+}) {
+  const bg = getHeatColor(orders);
+  const isDark = orders >= 7;
+
+  return (
+    <div
+      className={`
+        relative w-full min-h-[88px] p-3
+        rounded-xl border border-black/10
+        flex flex-col justify-between gap-2
+        shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]
+        transition-all duration-150
+        hover:shadow-md hover:scale-[1.02] hover:z-10
+        ${className}
+      `}
+      style={{ backgroundColor: bg }}
+      title={`${orders} orders`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <h3
+          className={`text-[11px] font-semibold leading-snug line-clamp-2 pr-1 ${
+            isDark ? "text-white" : "text-gray-900"
+          }`}
+        >
+          {warehouseName}
+        </h3>
+
+        <span
+          className={`
+            shrink-0 min-w-[22px] px-1.5 py-0.5 rounded-md text-[10px] font-bold tabular-nums
+            ${isDark ? "bg-black/25 text-white" : "bg-white/70 text-gray-800"}
+          `}
+        >
+          {orders}
+        </span>
+      </div>
+
+      {address ? (
+        <p
+          className={`text-[10px] leading-snug line-clamp-2 ${
+            isDark ? "text-white/85" : "text-gray-600"
+          }`}
+        >
+          {address}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+export const demand_Heat_Card = Demand_Heat_Card;

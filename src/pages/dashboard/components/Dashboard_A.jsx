@@ -43,9 +43,9 @@ const dashboardCards = [
 
 export default function Dashboard_A() {
   return (
-    <div className="flex justify-between gap-5">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-5">
       {dashboardCards.map((card) => (
-        <D_CARD key={card.title} {...card} />
+        <D_CARD key={card.title} {...card} className="h-full w-full" />
       ))}
     </div>
   );

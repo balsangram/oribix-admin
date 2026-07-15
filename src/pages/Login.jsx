@@ -8,13 +8,51 @@ import { BUTTON } from "../components/basicComponents/Button";
 import { L } from "../components/basicComponents/Link";
 import { INPUT, LABEL } from "../components/basicComponents/Form";
 import { IMG } from "../components/basicComponents/Image";
+import { toast } from "../components/basicComponents/TostMessage";
+import { login } from "../api/auth";
 
 function Login() {
   const navigate = useNavigate();
   const [trustDevice, setTrustDevice] = useState(false);
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    navigate("/verify-otp");
+  const handleLogin = async () => {
+    if (loading) return;
+
+    if (!identifier.trim() || !password) {
+      toast.error("Please enter username and password.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { data } = await login({
+        identifier: identifier.trim(),
+        password,
+      });
+
+      if (trustDevice) {
+        localStorage.setItem("trustDevice", "true");
+      } else {
+        localStorage.removeItem("trustDevice");
+      }
+
+      sessionStorage.setItem("loginIdentifier", identifier.trim());
+
+      navigate("/verify-otp", {
+        state: {
+          identifier: identifier.trim(),
+          message: data?.message || data?.data?.message,
+        },
+      });
+    } catch (err) {
+      toast.error(err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,6 +88,8 @@ function Login() {
             color="white"
             placeholder="Enter your username"
             className="h-12 rounded-xl"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
           />
         </div>
 
@@ -68,6 +108,8 @@ function Login() {
             color="white"
             placeholder="Enter your password"
             className="h-12 rounded-xl"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
@@ -105,7 +147,7 @@ function Login() {
           onClick={handleLogin}
           className="w-full h-12 rounded-xl font-semibold shadow-[0_0_30px_rgba(47,155,243,0.45)]"
         >
-          Continue
+          {loading ? "Please wait..." : "Continue"}
         </BUTTON>
 
         {/* Footer */}

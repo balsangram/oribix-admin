@@ -14,63 +14,63 @@ const NAV_GROUPS = [
         label: 'MISSION CONTROL',
         items: [
             { label: 'Live Ops', icon: LayoutDashboard, to: '/dashboard' },
-            { label: 'Order Pipeline', icon: GitBranch, to: '/admin/pipeline' },
-            { label: 'Live Map + Replay', icon: Map, to: '/admin/livemap' },
+            { label: 'Demand Heat Map', icon: GitBranch, to: '/demand-heat-map' },
+            { label: 'Live Map + Replay', icon: Map, to: '/livemap' },
         ],
     },
     {
         label: 'VENDORS & KYC',
         items: [
-            { label: 'Warehouses & Vendors', icon: Building2, to: '/admin/vendors' },
-            { label: 'KYC Lifecycle', icon: ShieldCheck, to: '/admin/kyc' },
+            { label: 'Warehouses & Vendors', icon: Building2, to: '/vendors' },
+            { label: 'KYC Lifecycle', icon: ShieldCheck, to: '/kyc' },
         ],
     },
     {
         label: 'CATALOG',
         items: [
-            { label: 'Catalog', icon: Package, to: '/admin/catalog' },
+            { label: 'Catalog', icon: Package, to: '/catalog' },
         ],
     },
     {
         label: 'ORDER LIFECYCLE & COMPLIANCE',
         items: [
-            { label: 'Orders', icon: ShoppingCart, to: '/admin/orders' },
-            { label: 'E-Way Bill Review', icon: FileText, to: '/admin/eway' },
-            { label: 'Manual Override', icon: Sliders, to: '/admin/override' },
+            { label: 'Orders', icon: ShoppingCart, to: '/orders' },
+            { label: 'E-Way Bill Review', icon: FileText, to: '/eway' },
+            { label: 'Manual Override', icon: Sliders, to: '/override' },
         ],
     },
     {
         label: 'LOGISTICS',
         items: [
-            { label: 'Multi-3PL Routing', icon: Truck, to: '/admin/logistics' },
+            { label: 'Multi-3PL Routing', icon: Truck, to: '/logistics' },
         ],
     },
     {
         label: 'CUSTOMERS, DRIVERS & SUPPORT',
         items: [
-            { label: 'Customers', icon: Users, to: '/admin/customers' },
-            { label: 'Drivers & Fleet', icon: Car, to: '/admin/drivers' },
-            { label: 'Support · Tickets', icon: HeadphonesIcon, to: '/admin/support' },
+            { label: 'Customers', icon: Users, to: '/customers' },
+            { label: 'Drivers & Fleet', icon: Car, to: '/drivers' },
+            { label: 'Support · Tickets', icon: HeadphonesIcon, to: '/support' },
         ],
     },
     {
         label: 'FINANCE & ANALYTICS',
         items: [
-            { label: 'Revenue & Margin', icon: BarChart3, to: '/admin/finance' },
+            { label: 'Revenue & Margin', icon: BarChart3, to: '/finance' },
         ],
     },
     {
         label: 'BROADCAST & GROWTH',
         items: [
-            { label: 'Broadcasts', icon: Megaphone, to: '/admin/broadcasts' },
-            { label: 'Promos & Referrals', icon: Gift, to: '/admin/promos' },
+            { label: 'Broadcasts', icon: Megaphone, to: '/broadcasts' },
+            { label: 'Promos & Referrals', icon: Gift, to: '/promos' },
         ],
     },
     {
         label: 'SETTINGS',
         items: [
-            { label: 'User Management', icon: UserCog, to: '/admin/users' },
-            { label: 'Platform Settings', icon: Settings, to: '/admin/settings' },
+            { label: 'User Management', icon: UserCog, to: '/users' },
+            { label: 'Platform Settings', icon: Settings, to: '/settings' },
         ],
     },
 ];
@@ -175,7 +175,7 @@ export default function Sidebar() {
 
                     {/* Sign out */}
                     <button
-                        onClick={() => navigate('/admin/login')}
+                        onClick={() => navigate('/login')}
                         className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-colors text-[12px] font-medium ${collapsed ? 'justify-center' : ''}`}
                         title={collapsed ? 'Sign out' : undefined}
                     >

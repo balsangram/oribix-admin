@@ -1,14 +1,23 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import ConsoleLayout from './layouts/ConsoleLayout';
-import MissionControl from './pages/MissionControl';
 import ComingSoon from './pages/ComingSoon';
 import VerifyOTP from './pages/VerifyOTP';
 import DashboardView from './pages/dashboard/DashboardView';
+import DemandHeatMapView from './pages/demandHeatMap/DemandHeatMapView';
+import VendorsView from './pages/vendors/VendorsView';
+import KYCLifeCycleView from './pages/kycLifeCycle/KYCLifeCycleView';
+import CatalogView from './pages/Catalog/CatalogView';
+import OrderView from './pages/order/OrderView';
+import EwayBillView from './pages/ewayBill/EwayBillView';
+import ReturnsView from './pages/returns /ReturnsView';
+import CustomersView from './pages/customers/CustomersView';
+import TostMessage from './components/basicComponents/TostMessage';
 
 function App() {
   return (
     <BrowserRouter>
+      <TostMessage />
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
@@ -21,20 +30,27 @@ function App() {
 
         <Route path="dashboard" element={<DashboardView />} />
 
+{/* OrderPipeLineView ============== */}
+          <Route path="demand-heat-map" element={<DemandHeatMapView/>} />
 
 
-          <Route path="console" element={<MissionControl />} />
-          {/* Placeholder routes for future pages */}
-          <Route path="pipeline" element={<ComingSoon />} />
           <Route path="livemap" element={<ComingSoon />} />
-          <Route path="vendors" element={<ComingSoon />} />
-          <Route path="kyc" element={<ComingSoon />} />
-          <Route path="catalog" element={<ComingSoon />} />
-          <Route path="orders" element={<ComingSoon />} />
-          <Route path="eway" element={<ComingSoon />} />
-          <Route path="override" element={<ComingSoon />} />
+
+          {/* VendorsView =================== */}
+          <Route path="vendors" element={<VendorsView />} />
+          {/* kyc ======================== */}
+          <Route path="kyc" element={<KYCLifeCycleView />} />
+          {/* Catalog ============================ */}
+          <Route path="catalog" element={<CatalogView />} />
+          {/* Order =================================== */}
+          <Route path="orders" element={<OrderView />} />
+          {/* eway =========================== */}
+          <Route path="eway" element={<EwayBillView />} />
+          {/* ========================ReturnsView */}
+          <Route path="override" element={<ReturnsView />} />
           <Route path="logistics" element={<ComingSoon />} />
-          <Route path="customers" element={<ComingSoon />} />
+          {/* CustomersView ============================= */}
+          <Route path="customers" element={<CustomersView />} />
           <Route path="drivers" element={<ComingSoon />} />
           <Route path="support" element={<ComingSoon />} />
           <Route path="finance" element={<ComingSoon />} />
