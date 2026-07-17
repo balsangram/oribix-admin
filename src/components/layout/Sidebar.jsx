@@ -36,13 +36,7 @@ const NAV_GROUPS = [
         items: [
             { label: 'Orders', icon: ShoppingCart, to: '/orders' },
             { label: 'E-Way Bill Review', icon: FileText, to: '/eway' },
-            { label: 'Manual Override', icon: Sliders, to: '/override' },
-        ],
-    },
-    {
-        label: 'LOGISTICS',
-        items: [
-            { label: 'Multi-3PL Routing', icon: Truck, to: '/logistics' },
+            { label: 'Returns & Disputes', icon: Sliders, to: '/return' },
         ],
     },
     {

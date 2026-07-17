@@ -17,6 +17,11 @@ import TostMessage from './components/basicComponents/TostMessage';
 import LiveMapView from './pages/liveMap/LiveMapView';
 import DriversView from './pages/drivers/DriversView';
 import SettingView from './pages/setting/SettingView';
+import SupportView from './pages/ Support/SupportView';
+import BroadcastsView from './pages/broadcasts/BroadcastsView';
+import ReferralsView from './pages/referrals/ReferralsView';
+import UserManagementView from './pages/userManagement/UserManagementView';
+import FinanceView from './pages/finance/FinanceView';
 
 function App() {
   return (
@@ -52,17 +57,23 @@ function App() {
           {/* eway =========================== */}
           <Route path="eway" element={<EwayBillView />} />
           {/* ========================ReturnsView */}
-          <Route path="override" element={<ReturnsView />} />
+          <Route path="return" element={<ReturnsView />} />
+
           <Route path="logistics" element={<ComingSoon />} />
           {/* CustomersView ============================= */}
           <Route path="customers" element={<CustomersView />} />
           {/* drivers =================================== */}
           <Route path="drivers" element={<DriversView />} />
-          <Route path="support" element={<ComingSoon />} />
-          <Route path="finance" element={<ComingSoon />} />
-          <Route path="broadcasts" element={<ComingSoon />} />
-          <Route path="promos" element={<ComingSoon />} />
-          <Route path="users" element={<ComingSoon />} />
+          {/* Support ============================ */}
+          <Route path="support" element={<SupportView />} />
+
+          <Route path="finance" element={<FinanceView />} />
+          {/* broadcasts ========================== */}
+          <Route path="broadcasts" element={<BroadcastsView />} />
+          {/* referrals ============================ */}
+          <Route path="promos" element={<ReferralsView />} />
+          {/* userManagementView =========================== */}
+          <Route path="users" element={<UserManagementView />} />
           <Route path="settings" element={<SettingView />} />
         </Route>
       </Routes>

@@ -18,7 +18,7 @@ export default function ConsoleLayout() {
         '/catalog': 'Catalog',
         '/orders': 'Orders',
         '/eway': 'E-Way Bill',
-        '/override': 'Manual Override',
+        '/return': 'Returns & Disputes',
         '/logistics': 'Logistics',
         '/customers': 'Customers',
         '/drivers': 'Drivers & Fleet',
