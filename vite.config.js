@@ -8,6 +8,6 @@ export default defineConfig({
     react()
   ],
   server: {
-    port: 5174, // Running admin on 5174 to not conflict with vendor/backend
+    port: 5173, // Running admin on 5174 to not conflict with vendor/backend
   }
 })

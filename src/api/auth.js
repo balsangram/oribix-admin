@@ -10,10 +10,14 @@ export const verifyOtp = (payload) =>
 export const sendOtp = (payload) =>
   apiClient.post("/api/auth/send-otp", payload);
 
+export const changePassword = (payload) =>
+  apiClient.post("/api/auth/change-password", payload);
+
 const authApi = {
   login,
   verifyOtp,
   sendOtp,
+  changePassword,
 };
 
 export default authApi;

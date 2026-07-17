@@ -7,12 +7,16 @@ import DashboardView from './pages/dashboard/DashboardView';
 import DemandHeatMapView from './pages/demandHeatMap/DemandHeatMapView';
 import VendorsView from './pages/vendors/VendorsView';
 import KYCLifeCycleView from './pages/kycLifeCycle/KYCLifeCycleView';
+import KYCLifeCycleFullDetails from './pages/kycLifeCycle/KYCLifeCycleFullDetails';
 import CatalogView from './pages/Catalog/CatalogView';
 import OrderView from './pages/order/OrderView';
 import EwayBillView from './pages/ewayBill/EwayBillView';
 import ReturnsView from './pages/returns /ReturnsView';
 import CustomersView from './pages/customers/CustomersView';
 import TostMessage from './components/basicComponents/TostMessage';
+import LiveMapView from './pages/liveMap/LiveMapView';
+import DriversView from './pages/drivers/DriversView';
+import SettingView from './pages/setting/SettingView';
 
 function App() {
   return (
@@ -34,12 +38,13 @@ function App() {
           <Route path="demand-heat-map" element={<DemandHeatMapView/>} />
 
 
-          <Route path="livemap" element={<ComingSoon />} />
+          <Route path="livemap" element={<LiveMapView />} />
 
           {/* VendorsView =================== */}
           <Route path="vendors" element={<VendorsView />} />
           {/* kyc ======================== */}
           <Route path="kyc" element={<KYCLifeCycleView />} />
+          <Route path="kyc-full-details/:id" element={<KYCLifeCycleFullDetails />} />
           {/* Catalog ============================ */}
           <Route path="catalog" element={<CatalogView />} />
           {/* Order =================================== */}
@@ -51,13 +56,14 @@ function App() {
           <Route path="logistics" element={<ComingSoon />} />
           {/* CustomersView ============================= */}
           <Route path="customers" element={<CustomersView />} />
-          <Route path="drivers" element={<ComingSoon />} />
+          {/* drivers =================================== */}
+          <Route path="drivers" element={<DriversView />} />
           <Route path="support" element={<ComingSoon />} />
           <Route path="finance" element={<ComingSoon />} />
           <Route path="broadcasts" element={<ComingSoon />} />
           <Route path="promos" element={<ComingSoon />} />
           <Route path="users" element={<ComingSoon />} />
-          <Route path="settings" element={<ComingSoon />} />
+          <Route path="settings" element={<SettingView />} />
         </Route>
       </Routes>
     </BrowserRouter>

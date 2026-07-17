@@ -30,7 +30,12 @@ export default function ConsoleLayout() {
         '/settings': 'Platform Settings',
     };
 
-    const currentTitle = pathToTitle[location.pathname] || 'Dashboard';
+    const currentTitle =
+        pathToTitle[location.pathname] ||
+        (location.pathname.startsWith("/kyc-full-details")
+            ? "KYC Details"
+            : "Dashboard");
+
 
     return (
         <div className="flex h-screen w-screen overflow-hidden bg-[#f3f5f8] font-sans">
