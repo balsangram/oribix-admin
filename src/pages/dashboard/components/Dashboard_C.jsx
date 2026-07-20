@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import CommonTable from '../../../components/basicComponents/Table'
 import { MapPin, Bell } from 'lucide-react'
 
@@ -22,13 +22,16 @@ export function Dashboard_C() {
 
 
 function NetworkOrder(){
+  const [activeTab, setActiveTab] = useState('All')
+  const [page, setPage] = useState(1)
+
   const columns = [
     { key: 'orderId', label: 'Order ID' },
     { key: 'supplier', label: 'Supplier' },
     { key: 'pickup', label: 'Pickup' },
     { key: 'amount', label: 'Amount' },
     { key: 'sla', label: 'SLA' },
-    { key: 'status', label: 'Status' },
+    { key: 'status', label: 'Status', type: 'status' },
   ]
 
   const data = [
@@ -39,18 +42,45 @@ function NetworkOrder(){
     { orderId: 'HSZ-10425', supplier: 'Kapoor Infra', pickup: 'Spark Fabrics', amount: 'Rs 67,200', sla: '10:30 AM', status: 'Delivered' },
   ]
 
+  const filtered = useMemo(() => {
+    if (activeTab === 'All') return data
+    if (activeTab === 'New') return data.filter((r) => r.status === 'Accepted')
+    if (activeTab === 'In progress') {
+      return data.filter((r) =>
+        ['Out for delivery', 'Packed', 'Picking'].includes(r.status)
+      )
+    }
+    if (activeTab === 'Dispatched') {
+      return data.filter((r) =>
+        ['Out for delivery', 'Delivered'].includes(r.status)
+      )
+    }
+    return data
+  }, [activeTab])
+
   return (
     <CommonTable
       title="Network orders · Live"
       tabs={[
-        { label: 'All', active: true },
-        { label: 'New', count: 40 },
-        { label: 'In progress', count: 98 },
-        { label: 'Dispatched', count: 56 },
+        { label: 'All', active: activeTab === 'All' },
+        { label: 'New', count: 40, active: activeTab === 'New' },
+        { label: 'In progress', count: 98, active: activeTab === 'In progress' },
+        { label: 'Dispatched', count: 56, active: activeTab === 'Dispatched' },
       ]}
+      onTabChange={(tab) => {
+        setActiveTab(tab.label)
+        setPage(1)
+      }}
       columns={columns}
-      data={data}
+      data={filtered}
       onViewAll={() => {}}
+      pagination={{
+        page,
+        pageSize: 5,
+        total: 240,
+        totalPages: 12,
+        onPageChange: setPage,
+      }}
     />
   )
 }
