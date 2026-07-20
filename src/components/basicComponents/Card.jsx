@@ -65,28 +65,46 @@ export function S_CARD({
   );
 }
 
-import { VS_CARD } from "./VS_CARD";
+function hexToRgba(hex, alpha = 1) {
+  const clean = hex.replace("#", "");
+  const full =
+    clean.length === 3
+      ? clean
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : clean;
+  const r = parseInt(full.slice(0, 2), 16);
+  const g = parseInt(full.slice(2, 4), 16);
+  const b = parseInt(full.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
-export default function PipelineCards() {
+export function VS_CARD({ children, className = "", valueColor = "#0f172a" }) {
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-      {pipelineData.map((item) => (
-        <VS_CARD key={item.title} className="p-6">
-          <p className="text-sm font-medium text-slate-500">
-            {item.title}
-          </p>
-
-          <h2
-            className={`mt-3 text-4xl font-bold tracking-tight ${item.valueColor} ${item.valueShadow}`}
-          >
-            {item.value}
-          </h2>
-
-          <p className={`mt-2 text-sm font-medium ${item.subtitleColor}`}>
-            {item.subtitle}
-          </p>
-        </VS_CARD>
-      ))}
+    <div
+      className={`
+        ${cardSize.verySmall}
+        bg-white
+        rounded-2xl
+        border border-gray-200
+        transition-all duration-300 ease-in-out
+        hover:-translate-y-1
+        ${className}
+      `}
+      style={{
+        "--card-shadow": `0 1px 4px ${hexToRgba(valueColor, 0.06)}, 0 4px 12px ${hexToRgba(valueColor, 0.08)}`,
+        "--card-shadow-hover": `0 4px 12px ${hexToRgba(valueColor, 0.10)}, 0 10px 24px ${hexToRgba(valueColor, 0.12)}`,
+        boxShadow: "var(--card-shadow)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = "var(--card-shadow-hover)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = "var(--card-shadow)";
+      }}
+    >
+      {children}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { VS_CARD } from '../../../components/basicComponents/Card';
+
 const ewaySummary = [
   {
     title: "Total E-Way Bills",
