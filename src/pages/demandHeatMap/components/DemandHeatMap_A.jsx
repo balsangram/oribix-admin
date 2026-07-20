@@ -3,32 +3,32 @@ import { VS_CARD } from "../../../components/basicComponents/Card";
 
 const pipelineData = [
   {
-    title: "Cart → Checkout",
-    value: "64%",
+    title: "Orders Received",
+    value: "4,286",
     valueColor: "text-slate-900",
-    subtitle: "↑ 3% vs 7d",
+    // subtitle: "+12% today",
     subtitleColor: "text-green-600",
   },
   {
-    title: "Checkout → Placed",
-    value: "82%",
+    title: "Orders Packed",
+    value: "3,912",
     valueColor: "text-slate-900",
-    subtitle: "Stable",
-    subtitleColor: "text-gray-500",
+    // subtitle: "91% completion",
+    subtitleColor: "text-green-600",
   },
   {
-    title: "Placed → Delivered",
-    value: "91%",
+    title: "Orders Delivered",
+    value: "3,764",
     valueColor: "text-green-600",
-    subtitle: "",
-    subtitleColor: "",
+    // subtitle: "96% success rate",
+    subtitleColor: "text-green-600",
   },
   {
-    title: "Avg cycle",
-    value: "38h",
+    title: "Average Delivery Time",
+    value: "34 min",
     valueColor: "text-slate-900",
-    subtitle: "Placed → Delivered",
-    subtitleColor: "text-gray-500",
+    // subtitle: "-3 min vs yesterday",
+    subtitleColor: "text-blue-600",
   },
 ];
 

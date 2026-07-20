@@ -1,39 +1,39 @@
 import React from 'react'
 import { VS_CARD } from '../../../components/basicComponents/Card';
-const pipelineData = [
+const ewaySummary = [
   {
-    title: "Cart → Checkout",
-    value: "64%",
+    title: "Total E-Way Bills",
+    value: "1,286",
     valueColor: "text-slate-900",
-    // subtitle: "↑ 3% vs 7d",
+    // subtitle: "+38 generated today",
     subtitleColor: "text-green-600",
   },
   {
-    title: "Checkout → Placed",
-    value: "82%",
-    valueColor: "text-slate-900",
-    // subtitle: "Stable",
-    subtitleColor: "text-gray-500",
+    title: "Pending Review",
+    value: "42",
+    valueColor: "text-amber-600",
+    // subtitle: "Awaiting verification",
+    subtitleColor: "text-amber-600",
   },
   {
-    title: "Placed → Delivered",
-    value: "91%",
+    title: "Verified",
+    value: "1,208",
     valueColor: "text-green-600",
-    // subtitle: "",
-    subtitleColor: "",
+    // subtitle: "94% compliance",
+    subtitleColor: "text-green-600",
   },
   {
-    title: "Avg cycle",
-    value: "38h",
-    valueColor: "text-slate-900",
-    // subtitle: "Placed → Delivered",
-    subtitleColor: "text-gray-500",
+    title: "Expiring Today",
+    value: "36",
+    valueColor: "text-orange-600",
+    // subtitle: "Requires action",
+    subtitleColor: "text-orange-600",
   },
 ];
 function Catalog_A() {
   return (
      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 p-6 ">
-            {pipelineData.map((item, index) => (
+            {ewaySummary.map((item, index) => (
           <VS_CARD
         key={index}
         className="flex flex-col justify-center"

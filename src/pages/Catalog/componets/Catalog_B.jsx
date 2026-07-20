@@ -17,13 +17,24 @@ import {
 } from "lucide-react";
 import { SEARCH } from "../../../components/basicComponents/Search";
 import { toast } from "../../../components/basicComponents/TostMessage";
-import { getProducts, getProductDetails, updateProduct } from "../../../api/admin";
+import { getProducts, getProductDetails, updateProduct, createProduct, deleteProduct, getCategories, getBrands, getSubCategories } from "../../../api/admin";
 
 const emptyForm = {
   name: "",
   slug: "",
   hsnCode: "",
   gstPercentage: "",
+  isActive: true,
+};
+
+const emptyCreateForm = {
+  name: "",
+  categoryId: "",
+  subCategoryId: "",
+  brandId: "",
+  hsnCode: "",
+  gstPercentage: "",
+  description: "",
   isActive: true,
 };
 
@@ -36,7 +47,20 @@ function Catalog_B() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
 
-  // image state
+  // create product state
+  const [creating, setCreating] = useState(false);
+  const [createForm, setCreateForm] = useState(emptyCreateForm);
+  const [creatingSaving, setCreatingSaving] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [loadingLookups, setLoadingLookups] = useState(false);
+  const [loadingSubs, setLoadingSubs] = useState(false);
+  const [createThumbFile, setCreateThumbFile] = useState(null);
+  const [createThumbPreview, setCreateThumbPreview] = useState("");
+  const [createImages, setCreateImages] = useState([]); // [{ file, preview }]
+
+  // image state (edit)
   const [thumbUrl, setThumbUrl] = useState(""); // existing thumbnail url
   const [thumbFile, setThumbFile] = useState(null); // newly selected thumbnail file
   const [thumbPreview, setThumbPreview] = useState(""); // preview for new thumbnail
@@ -52,6 +76,7 @@ function Catalog_B() {
   const [viewProduct, setViewProduct] = useState(null); // base product for header
   const [viewDetails, setViewDetails] = useState(null); // full details with vendors
   const [loadingView, setLoadingView] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -79,6 +104,141 @@ function Catalog_B() {
         p.category?.name?.toLowerCase().includes(q)
     );
   }, [query, products]);
+
+  const openCreate = async () => {
+    setCreating(true);
+    setCreateForm(emptyCreateForm);
+    setSubCategories([]);
+    setCreateThumbFile(null);
+    setCreateThumbPreview("");
+    setCreateImages([]);
+    setLoadingLookups(true);
+    try {
+      const [catRes, brandRes] = await Promise.all([
+        getCategories(),
+        getBrands(),
+      ]);
+      setCategories(catRes?.data?.data || []);
+      setBrands(brandRes?.data?.data || []);
+    } catch (err) {
+      toast.error(err.message || "Failed to load categories/brands");
+      setCreating(false);
+    } finally {
+      setLoadingLookups(false);
+    }
+  };
+
+  const closeCreate = () => {
+    if (createThumbPreview) URL.revokeObjectURL(createThumbPreview);
+    createImages.forEach((n) => URL.revokeObjectURL(n.preview));
+    setCreating(false);
+    setCreateForm(emptyCreateForm);
+    setSubCategories([]);
+    setCreateThumbFile(null);
+    setCreateThumbPreview("");
+    setCreateImages([]);
+  };
+
+  const handleCreateChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setCreateForm((f) => ({
+      ...f,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleCreateThumbChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (createThumbPreview) URL.revokeObjectURL(createThumbPreview);
+    setCreateThumbFile(file);
+    setCreateThumbPreview(URL.createObjectURL(file));
+  };
+
+  const handleCreateImagesChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setCreateImages((prev) => [
+      ...prev,
+      ...files.map((file) => ({ file, preview: URL.createObjectURL(file) })),
+    ]);
+    e.target.value = "";
+  };
+
+  const removeCreateImage = (idx) => {
+    setCreateImages((prev) => {
+      const target = prev[idx];
+      if (target) URL.revokeObjectURL(target.preview);
+      return prev.filter((_, i) => i !== idx);
+    });
+  };
+
+  const handleCategoryChange = async (e) => {
+    const categoryId = e.target.value;
+    setCreateForm((f) => ({ ...f, categoryId, subCategoryId: "" }));
+    setSubCategories([]);
+    if (!categoryId) return;
+
+    setLoadingSubs(true);
+    try {
+      const res = await getSubCategories(categoryId);
+      setSubCategories(res?.data?.data || []);
+    } catch (err) {
+      toast.error(err.message || "Failed to load sub-categories");
+    } finally {
+      setLoadingSubs(false);
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!createForm.name.trim()) {
+      toast.error("Product name is required");
+      return;
+    }
+    if (!createForm.categoryId) {
+      toast.error("Category is required");
+      return;
+    }
+    if (!createForm.brandId) {
+      toast.error("Brand is required");
+      return;
+    }
+
+    setCreatingSaving(true);
+    try {
+      const fd = new FormData();
+      fd.append("name", createForm.name.trim());
+      fd.append("categoryId", createForm.categoryId);
+      fd.append("brandId", createForm.brandId);
+      fd.append("isActive", createForm.isActive);
+      if (createForm.subCategoryId) {
+        fd.append("subCategoryId", createForm.subCategoryId);
+      }
+      if (createForm.hsnCode.trim()) {
+        fd.append("hsnCode", createForm.hsnCode.trim());
+      }
+      if (createForm.gstPercentage !== "" && createForm.gstPercentage !== null) {
+        fd.append("gstPercentage", createForm.gstPercentage);
+      }
+      if (createForm.description.trim()) {
+        fd.append("description", createForm.description.trim());
+      }
+      if (createThumbFile) fd.append("thumbnail", createThumbFile);
+      createImages.forEach((n) => fd.append("images", n.file));
+
+      const res = await createProduct(fd);
+      const created = res?.data?.data;
+      if (created) {
+        setProducts((list) => [created, ...list]);
+      }
+      toast.success("Product created successfully");
+      closeCreate();
+    } catch (err) {
+      toast.error(err.message || "Failed to create product");
+    } finally {
+      setCreatingSaving(false);
+    }
+  };
 
   const openEdit = (p) => {
     setEditing(p);
@@ -179,6 +339,24 @@ function Catalog_B() {
     setViewProduct(null);
     setViewDetails(null);
     setLoadingView(false);
+  };
+
+  const handleDelete = async (p) => {
+    if (!window.confirm(`Delete product "${p.name}"? This cannot be undone.`)) {
+      return;
+    }
+    setDeletingId(p.productId);
+    try {
+      await deleteProduct(p.productId);
+      setProducts((list) => list.filter((item) => item.productId !== p.productId));
+      if (viewProduct?.productId === p.productId) closeView();
+      if (editing?.productId === p.productId) closeEdit();
+      toast.success("Product deleted successfully");
+    } catch (err) {
+      toast.error(err.message || "Failed to delete product");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const addTier = () => setTiers((t) => [...t, { minQty: "", price: "" }]);
@@ -284,12 +462,21 @@ function Catalog_B() {
             </p>
           </div>
         </div>
-        <div className="w-full max-w-sm">
-          <SEARCH
-            value={query}
-            onChange={setQuery}
-            placeholder="Search by name, brand or category…"
-          />
+        <div className="flex w-full max-w-xl flex-wrap items-center justify-end gap-3">
+          <div className="min-w-[220px] flex-1">
+            <SEARCH
+              value={query}
+              onChange={setQuery}
+              placeholder="Search by name, brand or category…"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={openCreate}
+            className="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-600"
+          >
+            <Plus size={16} /> Add Product
+          </button>
         </div>
       </div>
 
@@ -386,6 +573,20 @@ function Catalog_B() {
                         >
                           <Pencil size={13} /> Edit
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(p)}
+                          disabled={deletingId === p.productId}
+                          title="Delete product"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
+                        >
+                          {deletingId === p.productId ? (
+                            <Loader2 size={13} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={13} />
+                          )}
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -395,6 +596,228 @@ function Catalog_B() {
           </table>
         </div>
       </div>
+
+      {/* Create modal */}
+      {creating && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-xl">
+            <div className="sticky top-0 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">Add Product</h2>
+                <p className="text-xs text-slate-500">
+                  Create a new product in the catalog
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeCreate}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {loadingLookups ? (
+              <div className="px-6 py-16 text-center text-slate-400">
+                <Loader2 size={22} className="mx-auto animate-spin" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4 px-6 py-5 sm:grid-cols-2">
+                <Field
+                  label="Name *"
+                  name="name"
+                  value={createForm.name}
+                  onChange={handleCreateChange}
+                  className="sm:col-span-2"
+                />
+
+                <label className="block">
+                  <span className="mb-1.5 block text-xs font-semibold text-slate-600">
+                    Category *
+                  </span>
+                  <select
+                    name="categoryId"
+                    value={createForm.categoryId}
+                    onChange={handleCategoryChange}
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm outline-none focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                  >
+                    <option value="">Select category</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="block">
+                  <span className="mb-1.5 block text-xs font-semibold text-slate-600">
+                    Sub-category
+                  </span>
+                  <select
+                    name="subCategoryId"
+                    value={createForm.subCategoryId}
+                    onChange={handleCreateChange}
+                    disabled={!createForm.categoryId || loadingSubs}
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm outline-none focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100 disabled:opacity-60"
+                  >
+                    <option value="">
+                      {loadingSubs ? "Loading…" : "Optional"}
+                    </option>
+                    {subCategories.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="block sm:col-span-2">
+                  <span className="mb-1.5 block text-xs font-semibold text-slate-600">
+                    Brand *
+                  </span>
+                  <select
+                    name="brandId"
+                    value={createForm.brandId}
+                    onChange={handleCreateChange}
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm outline-none focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                  >
+                    <option value="">Select brand</option>
+                    {brands.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <Field
+                  label="HSN Code"
+                  name="hsnCode"
+                  value={createForm.hsnCode}
+                  onChange={handleCreateChange}
+                />
+                <Field
+                  label="GST %"
+                  name="gstPercentage"
+                  type="number"
+                  value={createForm.gstPercentage}
+                  onChange={handleCreateChange}
+                />
+
+                {/* Thumbnail */}
+                <div className="sm:col-span-2">
+                  <span className="mb-1.5 block text-xs font-semibold text-slate-600">
+                    Thumbnail
+                  </span>
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+                      {createThumbPreview ? (
+                        <img
+                          src={createThumbPreview}
+                          alt="thumbnail"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <ImageIcon size={22} className="text-slate-300" />
+                      )}
+                    </div>
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 px-3.5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                      <Upload size={15} />
+                      {createThumbPreview ? "Change image" : "Upload image"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleCreateThumbChange}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Gallery images */}
+                <div className="sm:col-span-2">
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-600">
+                      Images
+                    </span>
+                    <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50">
+                      <Upload size={13} /> Add images
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={handleCreateImagesChange}
+                      />
+                    </label>
+                  </div>
+
+                  {createImages.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-6 text-center text-xs text-slate-400">
+                      No images. Upload to display them here.
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-3">
+                      {createImages.map((n, idx) => (
+                        <ImageThumb
+                          key={n.preview}
+                          src={n.preview}
+                          badge="new"
+                          onRemove={() => removeCreateImage(idx)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <label className="block sm:col-span-2">
+                  <span className="mb-1.5 block text-xs font-semibold text-slate-600">
+                    Description
+                  </span>
+                  <textarea
+                    name="description"
+                    value={createForm.description}
+                    onChange={handleCreateChange}
+                    rows={3}
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm outline-none focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                  />
+                </label>
+
+                <label className="flex items-center gap-2 sm:col-span-2">
+                  <input
+                    type="checkbox"
+                    name="isActive"
+                    checked={createForm.isActive}
+                    onChange={handleCreateChange}
+                    className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-200"
+                  />
+                  <span className="text-sm font-medium text-slate-700">Active</span>
+                </label>
+              </div>
+            )}
+
+            <div className="sticky bottom-0 flex justify-end gap-3 border-t border-gray-100 bg-white px-6 py-4">
+              <button
+                type="button"
+                onClick={closeCreate}
+                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCreate}
+                disabled={creatingSaving || loadingLookups}
+                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
+              >
+                {creatingSaving && <Loader2 size={15} className="animate-spin" />}
+                Create product
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit modal */}
       {editing && (
@@ -799,7 +1222,29 @@ function Catalog_B() {
               </div>
             )}
 
-            <div className="sticky bottom-0 flex justify-end border-t border-gray-100 bg-white px-6 py-4">
+            <div className="sticky bottom-0 flex justify-end gap-3 border-t border-gray-100 bg-white px-6 py-4">
+              <button
+                type="button"
+                onClick={() => handleDelete(viewProduct)}
+                disabled={
+                  deletingId === viewProduct.productId ||
+                  loadingView ||
+                  (viewDetails?.summary?.vendorCount ?? 0) > 0
+                }
+                title={
+                  (viewDetails?.summary?.vendorCount ?? 0) > 0
+                    ? "Cannot delete: vendors have listed this product"
+                    : "Delete product"
+                }
+                className="mr-auto inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deletingId === viewProduct.productId ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <Trash2 size={15} />
+                )}
+                Delete
+              </button>
               <button
                 type="button"
                 onClick={closeView}
@@ -870,7 +1315,7 @@ function ImageThumb({ src, onRemove, badge }) {
   );
 }
 
-function Field({ label, name, value, onChange, type = "text", className = "" }) {
+function Field({ label, name, value, onChange, type = "text", className = "", placeholder = "" }) {
   return (
     <label className={`block ${className}`}>
       <span className="mb-1.5 block text-xs font-semibold text-slate-600">{label}</span>
@@ -879,6 +1324,7 @@ function Field({ label, name, value, onChange, type = "text", className = "" }) 
         type={type}
         value={value}
         onChange={onChange}
+        placeholder={placeholder}
         className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm outline-none focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100"
       />
     </label>

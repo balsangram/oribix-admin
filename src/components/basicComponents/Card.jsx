@@ -65,19 +65,28 @@ export function S_CARD({
   );
 }
 
-export function VS_CARD({ children, className = "" }) {
+import { VS_CARD } from "./VS_CARD";
+
+export default function PipelineCards() {
   return (
-    <div
-      className={`
-        ${cardSize.verySmall}
-        bg-white
-        rounded-2xl
-        border border-gray-200
-        shadow-[0_1px_2px_rgba(15,23,42,0.04),0_4px_12px_rgba(15,23,42,0.04)]
-        ${className}
-      `}
-    >
-      {children}
+    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+      {pipelineData.map((item) => (
+        <VS_CARD key={item.title} className="p-6">
+          <p className="text-sm font-medium text-slate-500">
+            {item.title}
+          </p>
+
+          <h2
+            className={`mt-3 text-4xl font-bold tracking-tight ${item.valueColor} ${item.valueShadow}`}
+          >
+            {item.value}
+          </h2>
+
+          <p className={`mt-2 text-sm font-medium ${item.subtitleColor}`}>
+            {item.subtitle}
+          </p>
+        </VS_CARD>
+      ))}
     </div>
   );
 }

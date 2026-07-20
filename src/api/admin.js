@@ -2,6 +2,13 @@ import apiClient from "./axios";
 
 const BASE = "/api/admin/v1";
 
+/** ADMIN PROFILE APIs */
+export const getAdminProfile = () =>
+  apiClient.get(`${BASE}/admin/profile`);
+
+export const updateAdminProfile = (payload) =>
+  apiClient.patch(`${BASE}/admin/profile`, payload);
+
 /** SUB ADMIN APIs */
 export const getSubAdmins = (params) =>
   apiClient.get(`${BASE}/sub-admins`, { params });
@@ -29,14 +36,30 @@ export const getVendorWarehouses = (vendorId) =>
   apiClient.get(`${BASE}/vendor/${vendorId}/warehouses`);
 
 /** PRODUCT APIs */
+export const getCategories = () =>
+  apiClient.get(`${BASE}/categories`);
+
+export const getBrands = () =>
+  apiClient.get(`${BASE}/brands`);
+
+export const getSubCategories = (categoryId) =>
+  apiClient.get(`${BASE}/sub-categories`, { params: { categoryId } });
+
 export const getProducts = (params) =>
   apiClient.get(`${BASE}/products`, { params });
 
 export const getProductDetails = (id) =>
   apiClient.get(`${BASE}/product/${id}`);
 
-export const createProduct = (payload) =>
-  apiClient.post(`${BASE}/product`, payload);
+export const createProduct = (payload) => {
+  const isForm =
+    typeof FormData !== "undefined" && payload instanceof FormData;
+  return apiClient.post(
+    `${BASE}/product`,
+    payload,
+    isForm ? { headers: { "Content-Type": undefined } } : undefined
+  );
+};
 
 export const updateProduct = (id, payload) => {
   const isForm =
@@ -64,6 +87,8 @@ export const deletePermission = (id) =>
   apiClient.delete(`${BASE}/permission/${id}`);
 
 const adminApi = {
+  getAdminProfile,
+  updateAdminProfile,
   getSubAdmins,
   getSubAdminDetails,
   createSubAdmin,
@@ -72,6 +97,9 @@ const adminApi = {
   getVendors,
   getVendorDetails,
   getVendorWarehouses,
+  getCategories,
+  getBrands,
+  getSubCategories,
   getProducts,
   getProductDetails,
   createProduct,

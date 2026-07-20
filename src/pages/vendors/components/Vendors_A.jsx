@@ -1,39 +1,39 @@
 import React from 'react'
 import { VS_CARD } from '../../../components/basicComponents/Card';
-const pipelineData = [
+const vendorSummary = [
   {
-    title: "Cart → Checkout",
-    value: "64%",
+    title: "Total Vendors",
+    value: "248",
     valueColor: "text-slate-900",
-    subtitle: "↑ 3% vs 7d",
+    // subtitle: "+18 this month",
     subtitleColor: "text-green-600",
   },
   {
-    title: "Checkout → Placed",
-    value: "82%",
-    valueColor: "text-slate-900",
-    subtitle: "Stable",
-    subtitleColor: "text-gray-500",
-  },
-  {
-    title: "Placed → Delivered",
-    value: "91%",
+    title: "Verified Vendors",
+    value: "182",
     valueColor: "text-green-600",
-    subtitle: "",
-    subtitleColor: "",
+    // subtitle: "73% verification rate",
+    subtitleColor: "text-green-600",
   },
   {
-    title: "Avg cycle",
-    value: "38h",
+    title: "Pending Verification",
+    value: "51",
+    valueColor: "text-amber-600",
+    // subtitle: "Awaiting KYC review",
+    subtitleColor: "text-amber-600",
+  },
+  {
+    title: "Active Warehouses",
+    value: "96",
     valueColor: "text-slate-900",
-    subtitle: "Placed → Delivered",
-    subtitleColor: "text-gray-500",
+    // subtitle: "Across 28 cities",
+    subtitleColor: "text-slate-500",
   },
 ];
 function Vendors_A() {
   return (
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 p-6 ">
-        {pipelineData.map((item, index) => (
+        {vendorSummary.map((item, index) => (
       <VS_CARD
     key={index}
     className="flex flex-col justify-center"

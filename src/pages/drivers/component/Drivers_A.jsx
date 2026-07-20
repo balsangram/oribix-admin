@@ -1,39 +1,39 @@
 import React from 'react'
 import { VS_CARD } from '../../../components/basicComponents/Card';
-const pipelineData = [
+const fleetSummary = [
   {
-    title: "Cart → Checkout",
-    value: "64%",
+    title: "Total Drivers",
+    value: "248",
     valueColor: "text-slate-900",
-    // subtitle: "↑ 3% vs 7d",
+    // subtitle: "Across 18 hubs",
+    subtitleColor: "text-slate-500",
+  },
+  {
+    title: "On Delivery",
+    value: "186",
+    valueColor: "text-blue-600",
+    // subtitle: "75% fleet utilization",
+    subtitleColor: "text-blue-600",
+  },
+  {
+    title: "Available",
+    value: "42",
+    valueColor: "text-green-600",
+    // subtitle: "Ready for dispatch",
     subtitleColor: "text-green-600",
   },
   {
-    title: "Checkout → Placed",
-    value: "82%",
-    valueColor: "text-slate-900",
-    // subtitle: "Stable",
-    subtitleColor: "text-gray-500",
-  },
-  {
-    title: "Placed → Delivered",
-    value: "91%",
-    valueColor: "text-green-600",
-    // subtitle: "",
-    subtitleColor: "",
-  },
-  {
-    title: "Avg cycle",
-    value: "38h",
-    valueColor: "text-slate-900",
-    // subtitle: "Placed → Delivered",
-    subtitleColor: "text-gray-500",
+    title: "Avg Driver Rating",
+    value: "4.8★",
+    valueColor: "text-yellow-500",
+    // subtitle: "Based on 12,840 deliveries",
+    subtitleColor: "text-slate-500",
   },
 ];
 function Drivers_A() {
   return (
    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 p-6 ">
-                    {pipelineData.map((item, index) => (
+                    {fleetSummary.map((item, index) => (
                   <VS_CARD
                 key={index}
                 className="flex flex-col justify-center"

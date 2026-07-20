@@ -13,11 +13,19 @@ export const sendOtp = (payload) =>
 export const changePassword = (payload) =>
   apiClient.post("/api/auth/change-password", payload);
 
+export const forgotPassword = (payload) =>
+  apiClient.post("/api/auth/forgot-password", payload);
+
+export const resetPassword = (payload) =>
+  apiClient.post("/api/auth/reset-password", payload);
+
 const authApi = {
   login,
   verifyOtp,
   sendOtp,
   changePassword,
+  forgotPassword,
+  resetPassword,
 };
 
 export default authApi;

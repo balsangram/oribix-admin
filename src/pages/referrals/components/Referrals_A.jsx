@@ -1,40 +1,40 @@
 import React from 'react'
 import { VS_CARD } from '../../../components/basicComponents/Card';
 
-const pipelineData = [
+const promoSummary = [
   {
-    title: "Cart → Checkout",
-    value: "64%",
-    valueColor: "text-slate-900",
-    // subtitle: "↑ 3% vs 7d",
+    title: "Active Campaigns",
+    value: "18",
+    valueColor: "text-blue-600",
+    // subtitle: "5 ending this week",
+    subtitleColor: "text-blue-600",
+  },
+  {
+    title: "Coupons Redeemed",
+    value: "1,842",
+    valueColor: "text-green-600",
+    // subtitle: "74% redemption rate",
     subtitleColor: "text-green-600",
   },
   {
-    title: "Checkout → Placed",
-    value: "82%",
-    valueColor: "text-slate-900",
-    // subtitle: "Stable",
-    subtitleColor: "text-gray-500",
+    title: "Successful Referrals",
+    value: "426",
+    valueColor: "text-purple-600",
+    // subtitle: "+38 this month",
+    subtitleColor: "text-purple-600",
   },
   {
-    title: "Placed → Delivered",
-    value: "91%",
-    valueColor: "text-green-600",
-    // subtitle: "",
-    subtitleColor: "",
-  },
-  {
-    title: "Avg cycle",
-    value: "38h",
-    valueColor: "text-slate-900",
-    // subtitle: "Placed → Delivered",
-    subtitleColor: "text-gray-500",
+    title: "Discount Given",
+    value: "₹12.6L",
+    valueColor: "text-orange-600",
+    // subtitle: "This month",
+    subtitleColor: "text-orange-600",
   },
 ];
 function Referrals_A() {
   return (
    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 p-6 ">
-                         {pipelineData.map((item, index) => (
+                         {promoSummary.map((item, index) => (
                        <VS_CARD
                      key={index}
                      className="flex flex-col justify-center"

@@ -5,7 +5,6 @@ import Support_C, {
   priorityFilters,
   channelFilters,
 } from "./Support_C";
-import Support_D from "./Support_D";
 
 function Support_B() {
   const [query, setQuery] = useState("");
@@ -47,7 +46,6 @@ function Support_B() {
       </div>
 
       <Support_C query={query} priority={priority} channel={channel} />
-      <Support_D />
     </div>
   );
 }

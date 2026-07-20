@@ -1,39 +1,39 @@
 import React from 'react'
 import { VS_CARD } from '../../../components/basicComponents/Card';
-const pipelineData = [
+const supportSummary = [
   {
-    title: "Cart → Checkout",
-    value: "64%",
+    title: "Open Tickets",
+    value: "128",
     valueColor: "text-slate-900",
-    // subtitle: "↑ 3% vs 7d",
+    // subtitle: "34 new today",
     subtitleColor: "text-green-600",
   },
   {
-    title: "Checkout → Placed",
-    value: "82%",
-    valueColor: "text-slate-900",
-    // subtitle: "Stable",
-    subtitleColor: "text-gray-500",
+    title: "Avg First Response",
+    value: "9 min",
+    valueColor: "text-blue-600",
+    // subtitle: "Target < 15 min",
+    subtitleColor: "text-blue-600",
   },
   {
-    title: "Placed → Delivered",
-    value: "91%",
+    title: "Resolved Today",
+    value: "86",
     valueColor: "text-green-600",
-    // subtitle: "",
-    subtitleColor: "",
+    // subtitle: "91% SLA achieved",
+    subtitleColor: "text-green-600",
   },
   {
-    title: "Avg cycle",
-    value: "38h",
-    valueColor: "text-slate-900",
-    // subtitle: "Placed → Delivered",
-    subtitleColor: "text-gray-500",
+    title: "Critical (P1)",
+    value: "12",
+    valueColor: "text-red-600",
+    // subtitle: "Requires immediate attention",
+    subtitleColor: "text-red-600",
   },
 ];
 function Support_A() {
   return (
      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 p-6 ">
-                      {pipelineData.map((item, index) => (
+                      {supportSummary.map((item, index) => (
                     <VS_CARD
                   key={index}
                   className="flex flex-col justify-center"

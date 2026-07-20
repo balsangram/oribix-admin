@@ -1,11 +1,19 @@
-import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/layout/Sidebar';
-import { ChevronLeft, Search, Bell } from 'lucide-react';
+import { ChevronLeft, Search, Bell, User, Settings, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+    AdminProfileProvider,
+    useAdminProfile,
+} from '../context/AdminProfileContext';
 
-export default function ConsoleLayout() {
+function ConsoleShell() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+    const { fullName, email, initials, photo } = useAdminProfile();
 
     // Map paths to titles
     const pathToTitle = {
@@ -27,7 +35,8 @@ export default function ConsoleLayout() {
         '/broadcasts': 'Broadcasts',
         '/promos': 'Promos',
         '/users': 'User Management',
-        '/settings': 'Platform Settings',
+        '/settings': 'Settings',
+        '/profile': 'Profile',
     };
 
     const currentTitle =
@@ -36,6 +45,20 @@ export default function ConsoleLayout() {
             ? "KYC Details"
             : "Dashboard");
 
+    useEffect(() => {
+        setMenuOpen(false);
+    }, [location.pathname]);
+
+    useEffect(() => {
+        if (!menuOpen) return;
+        const onPointerDown = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', onPointerDown);
+        return () => document.removeEventListener('mousedown', onPointerDown);
+    }, [menuOpen]);
 
     return (
         <div className="flex h-screen w-screen overflow-hidden bg-[#f3f5f8] font-sans">
@@ -62,14 +85,65 @@ export default function ConsoleLayout() {
                             <Bell className="w-4 h-4 text-[#0b1220]" />
                             <span className="absolute top-2 right-2.5 w-1.5 h-1.5 rounded-full bg-[#1aa3ff]"></span>
                         </button>
-                        <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 transition-colors">
-                            <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden">
-                                <div className="w-full h-full bg-[#0b1220] flex items-center justify-center text-white text-[10px] font-bold">RD</div>
-                            </div>
-                            <div className="flex flex-col -space-y-0.5 pr-1">
-                                <span className="text-[12px] font-bold text-[#0b1220]">Rohan Desai</span>
-                                <span className="text-[10px] text-slate-400 font-medium">rohan@housizy.com</span>
-                            </div>
+                        <div className="relative" ref={menuRef}>
+                            <button
+                                type="button"
+                                onClick={() => setMenuOpen((open) => !open)}
+                                className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 transition-colors"
+                            >
+                                <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden">
+                                    {photo ? (
+                                        <img src={photo} alt={fullName} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full bg-[#0b1220] flex items-center justify-center text-white text-[10px] font-bold">
+                                            {initials}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex flex-col -space-y-0.5 pr-1 text-left">
+                                    <span className="text-[12px] font-bold text-[#0b1220]">{fullName}</span>
+                                    <span className="text-[10px] text-slate-400 font-medium">
+                                        {email || '—'}
+                                    </span>
+                                </div>
+                            </button>
+
+                            {menuOpen && (
+                                <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 bg-white shadow-lg overflow-hidden z-30">
+                                    <div className="px-4 py-3 border-b border-slate-100">
+                                        <div className="text-[13px] font-bold text-[#0b1220]">{fullName}</div>
+                                        <div className="text-[11px] text-slate-400 font-medium">
+                                            {email || '—'}
+                                        </div>
+                                    </div>
+                                    <div className="py-1.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate('/profile')}
+                                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                        >
+                                            <User className="w-4 h-4 text-slate-400" />
+                                            My profile
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate('/settings')}
+                                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                        >
+                                            <Settings className="w-4 h-4 text-slate-400" />
+                                            Settings
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate('/login')}
+                                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                        >
+                                            <LogOut className="w-4 h-4 text-slate-400" />
+                                            Sign out
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </header>
@@ -90,5 +164,13 @@ export default function ConsoleLayout() {
                 </main>
             </div>
         </div>
+    );
+}
+
+export default function ConsoleLayout() {
+    return (
+        <AdminProfileProvider>
+            <ConsoleShell />
+        </AdminProfileProvider>
     );
 }

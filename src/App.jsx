@@ -22,6 +22,9 @@ import BroadcastsView from './pages/broadcasts/BroadcastsView';
 import ReferralsView from './pages/referrals/ReferralsView';
 import UserManagementView from './pages/userManagement/UserManagementView';
 import FinanceView from './pages/finance/FinanceView';
+import Profile from './pages/profile/Profile';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -31,7 +34,8 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
-
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         {/* Admin Console — nested under layout */}
         <Route path="/" element={<ConsoleLayout />}>
 
@@ -75,6 +79,7 @@ function App() {
           {/* userManagementView =========================== */}
           <Route path="users" element={<UserManagementView />} />
           <Route path="settings" element={<SettingView />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
     </BrowserRouter>

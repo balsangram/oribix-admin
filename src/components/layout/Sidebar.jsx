@@ -3,11 +3,12 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     LayoutDashboard, GitBranch, Map, Building2, ShieldCheck,
-    Package, ShoppingCart, FileText, Sliders, Truck, Users,
+    Package, ShoppingCart, FileText, Sliders, Users,
     Car, HeadphonesIcon, BarChart3, Megaphone, Gift,
-    UserCog, Settings, PanelLeftClose, PanelLeftOpen, LogOut, ArrowLeft
+    UserCog, PanelLeftClose, PanelLeftOpen, LogOut, ArrowLeft
 } from 'lucide-react';
 import logo1 from '../../assets/logo1_cropped.png';
+import { useAdminProfile } from '../../context/AdminProfileContext';
 
 const NAV_GROUPS = [
     {
@@ -64,7 +65,6 @@ const NAV_GROUPS = [
         label: 'SETTINGS',
         items: [
             { label: 'User Management', icon: UserCog, to: '/users' },
-            { label: 'Platform Settings', icon: Settings, to: '/settings' },
         ],
     },
 ];
@@ -73,6 +73,7 @@ export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const { fullName, roleText, initials, photo } = useAdminProfile();
 
     return (
         <div className="relative flex-shrink-0" style={{ width: collapsed ? '72px' : '256px', transition: 'width 300ms' }}>
@@ -155,17 +156,26 @@ export default function Sidebar() {
                 {/* Footer */}
                 <div className="border-t border-white/10 p-3 shrink-0 space-y-1.5">
                     {/* Profile */}
-                    <div className={`flex items-center gap-2.5 px-2 py-1.5 rounded-xl ${collapsed ? 'justify-center' : ''}`}>
-                        <div className="w-7 h-7 rounded-full bg-[#1aa3ff]/20 border border-[#1aa3ff]/30 flex items-center justify-center shrink-0">
-                            <span className="text-[11px] font-bold text-[#1aa3ff]">R</span>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/profile')}
+                        className={`w-full flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/5 transition-colors ${collapsed ? 'justify-center' : ''}`}
+                        title={collapsed ? fullName : undefined}
+                    >
+                        <div className="w-7 h-7 rounded-full bg-[#1aa3ff]/20 border border-[#1aa3ff]/30 flex items-center justify-center shrink-0 overflow-hidden">
+                            {photo ? (
+                                <img src={photo} alt={fullName} className="w-full h-full object-cover" />
+                            ) : (
+                                <span className="text-[11px] font-bold text-[#1aa3ff]">{initials.charAt(0)}</span>
+                            )}
                         </div>
                         {!collapsed && (
-                            <div className="overflow-hidden">
-                                <div className="text-[12px] font-semibold text-white truncate">Rohan Desai</div>
-                                <div className="text-[10px] text-slate-500 truncate">Super Admin · Mumbai HQ</div>
+                            <div className="overflow-hidden text-left">
+                                <div className="text-[12px] font-semibold text-white truncate">{fullName}</div>
+                                <div className="text-[10px] text-slate-500 truncate">{roleText}</div>
                             </div>
                         )}
-                    </div>
+                    </button>
 
                     {/* Sign out */}
                     <button
