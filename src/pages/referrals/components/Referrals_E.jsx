@@ -10,7 +10,6 @@ const initialPromos = [
     audience: "All buyers",
     scope: "First order",
     validity: "Today → +30d",
-    usageLimit: 1000,
     status: "Active",
   },
   {
@@ -20,7 +19,6 @@ const initialPromos = [
     audience: "Returning buyers",
     scope: "All orders",
     validity: "01 Jul → 31 Jul",
-    usageLimit: 500,
     status: "Paused",
   },
 ];
@@ -63,7 +61,6 @@ function Referrals_E() {
         audience: data.audience,
         scope: data.scope,
         validity,
-        usageLimit: data.usageLimit,
         status: "Active",
       },
       ...prev,
@@ -100,7 +97,6 @@ function Referrals_E() {
               <th className="px-4 py-3">Audience</th>
               <th className="px-4 py-3">Scope</th>
               <th className="px-4 py-3">Validity</th>
-              <th className="px-4 py-3">Usage limit</th>
               <th className="px-4 py-3">Status</th>
             </tr>
           </thead>
@@ -118,7 +114,6 @@ function Referrals_E() {
                 <td className="px-4 py-3">{p.audience}</td>
                 <td className="px-4 py-3">{p.scope}</td>
                 <td className="px-4 py-3 text-xs">{p.validity}</td>
-                <td className="px-4 py-3">{p.usageLimit}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${

@@ -116,15 +116,15 @@ function GlowDot({ cx, cy }) {
   if (cx == null || cy == null) return null;
   return (
     <g>
-      <circle cx={cx} cy={cy} r={10} fill="#38BDF8" fillOpacity={0.2} />
-      <circle cx={cx} cy={cy} r={5} fill="#38BDF8" stroke="#0B1220" strokeWidth={2} />
+      <circle cx={cx} cy={cy} r={7} fill="#38BDF8" fillOpacity={0.2} />
+      <circle cx={cx} cy={cy} r={3.5} fill="#38BDF8" stroke="#0B1220" strokeWidth={1.5} />
     </g>
   );
 }
 
 export default function Dashboard_B() {
   return (
-    <div className="mt-6 grid grid-cols-1 items-stretch gap-6 xl:grid-cols-[3fr_2fr]">
+    <div className="mt-4 grid grid-cols-1 items-stretch gap-4 xl:grid-cols-[3fr_2fr] xl:h-[320px]">
       <Network_GMV />
       <Pipeline_By_Stage />
     </div>
@@ -147,12 +147,12 @@ function Network_GMV() {
 
   return (
     <div
-      className="relative flex h-[420px] flex-col overflow-hidden rounded-[28px] border border-white/10 p-6 text-white"
+      className="relative flex h-[320px] xl:h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-white/10 p-4 text-white"
       style={{
         background:
           "linear-gradient(165deg, #1a2236 0%, #0f1524 45%, #0b1220 100%)",
         boxShadow:
-          "0 1px 0 rgba(255,255,255,0.06) inset, 0 20px 50px rgba(15,23,42,0.35)",
+          "0 1px 0 rgba(255,255,255,0.06) inset, 0 16px 40px rgba(15,23,42,0.3)",
       }}
     >
       {/* soft glow */}
@@ -160,15 +160,15 @@ function Network_GMV() {
       <div className="pointer-events-none absolute -bottom-24 -left-10 h-48 w-48 rounded-full bg-orange-500/5 blur-3xl" />
 
       <div className="relative z-10 flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-orange-500/15 text-orange-400 ring-1 ring-orange-400/20">
-            <BarChart3 size={18} />
+        <div className="flex items-center gap-2">
+          <span className="grid h-7 w-7 place-items-center rounded-lg bg-orange-500/15 text-orange-400 ring-1 ring-orange-400/20">
+            <BarChart3 size={14} />
           </span>
-          <h2 className="text-base font-semibold tracking-tight">Network GMV</h2>
+          <h2 className="text-sm font-semibold tracking-tight">Network GMV</h2>
         </div>
 
-        <div className="flex items-center gap-3">
-          <span className="hidden text-[11px] text-slate-400 sm:inline">
+        <div className="flex items-center gap-2">
+          <span className="hidden text-[10px] text-slate-400 sm:inline">
             {series.updated}
           </span>
           <div className="inline-flex rounded-full bg-white/5 p-0.5 ring-1 ring-white/10">
@@ -177,7 +177,7 @@ function Network_GMV() {
                 key={option.key}
                 type="button"
                 onClick={() => setRange(option.key)}
-                className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors ${
                   range === option.key
                     ? "bg-white text-slate-900"
                     : "text-slate-400 hover:text-white"
@@ -189,45 +189,45 @@ function Network_GMV() {
           </div>
           <button
             type="button"
-            className="grid h-8 w-8 place-items-center rounded-full text-slate-400 hover:bg-white/5 hover:text-white"
+            className="grid h-7 w-7 place-items-center rounded-full text-slate-400 hover:bg-white/5 hover:text-white"
             aria-label="More options"
           >
-            <MoreHorizontal size={16} />
+            <MoreHorizontal size={14} />
           </button>
         </div>
       </div>
 
-      <div className="relative z-10 mt-5 flex flex-wrap items-end justify-between gap-4">
+      <div className="relative z-10 mt-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-[42px]">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-[28px] leading-none">
             {formatCurrency(series.total)}
           </h1>
-          <div className="mt-1 flex items-center gap-2">
-            <p className="text-sm text-slate-400">Network balance</p>
+          <div className="mt-1 flex items-center gap-1.5">
+            <p className="text-xs text-slate-400">Network balance</p>
             <span
-              className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold ${
+              className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
                 isUp
                   ? "bg-emerald-400/10 text-emerald-400"
                   : "bg-rose-400/10 text-rose-400"
               }`}
             >
-              {isUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+              {isUp ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />}
               {Math.abs(series.change)}%
             </span>
           </div>
         </div>
 
         <div className="text-right">
-          <p className="text-sm font-semibold text-white">{series.label}</p>
-          <p className="mt-0.5 text-xs text-slate-400">{series.rangeLabel}</p>
+          <p className="text-xs font-semibold text-white">{series.label}</p>
+          <p className="mt-0.5 text-[10px] text-slate-400">{series.rangeLabel}</p>
         </div>
       </div>
 
-      <div className="relative z-10 mt-4 min-h-0 flex-1 outline-none [&_.recharts-wrapper]:outline-none [&_svg]:outline-none [&_svg:focus]:outline-none [&_*]:outline-none">
+      <div className="relative z-10 mt-2 min-h-0 flex-1 outline-none [&_.recharts-wrapper]:outline-none [&_svg]:outline-none [&_svg:focus]:outline-none [&_*]:outline-none">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={series.data}
-            margin={{ top: 18, right: 12, left: 0, bottom: 4 }}
+            margin={{ top: 12, right: 8, left: 0, bottom: 0 }}
             style={{ outline: "none" }}
           >
             <defs>
@@ -255,7 +255,7 @@ function Network_GMV() {
               dataKey="label"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#64748B", fontSize: 11 }}
+              tick={{ fill: "#64748B", fontSize: 10 }}
               interval="preserveStartEnd"
               minTickGap={40}
             />
@@ -265,8 +265,8 @@ function Network_GMV() {
               axisLine={false}
               tickLine={false}
               ticks={series.yTicks}
-              tick={{ fill: "#64748B", fontSize: 11 }}
-              width={44}
+              tick={{ fill: "#64748B", fontSize: 10 }}
+              width={40}
               tickFormatter={(v) =>
                 v === series.estimate ? `₹${v}k EST.` : `₹${v}k`
               }
@@ -348,26 +348,26 @@ function Pipeline_By_Stage() {
 
   return (
     <div
-      className="relative flex h-[420px] flex-col overflow-hidden rounded-[28px] border border-white/10 p-6 text-white"
+      className="relative flex h-[320px] xl:h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-white/10 p-4 text-white"
       style={{
         background:
           "linear-gradient(165deg, #1a2236 0%, #0f1524 45%, #0b1220 100%)",
         boxShadow:
-          "0 1px 0 rgba(255,255,255,0.06) inset, 0 20px 50px rgba(15,23,42,0.35)",
+          "0 1px 0 rgba(255,255,255,0.06) inset, 0 16px 40px rgba(15,23,42,0.3)",
       }}
     >
       <div className="pointer-events-none absolute -left-10 top-0 h-40 w-40 rounded-full bg-violet-500/10 blur-3xl" />
 
-      <div className="relative z-10 mb-4 flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/20">
-            <Layers size={18} />
+      <div className="relative z-10 mb-2 flex shrink-0 items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="grid h-7 w-7 place-items-center rounded-lg bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/20">
+            <Layers size={14} />
           </span>
           <div>
-            <h2 className="text-base font-semibold tracking-tight">
+            <h2 className="text-sm font-semibold tracking-tight">
               Pipeline by Stage
             </h2>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[10px] text-slate-400">
               {total} open orders · tap to focus
             </p>
           </div>
@@ -377,23 +377,23 @@ function Pipeline_By_Stage() {
           <button
             type="button"
             onClick={() => setActiveStage(null)}
-            className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-slate-300 ring-1 ring-white/10 hover:bg-white/10"
+            className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-slate-300 ring-1 ring-white/10 hover:bg-white/10"
           >
             Clear
           </button>
         )}
       </div>
 
-      <div className="relative z-10 flex min-h-0 flex-1 items-center gap-5">
-        <div className="relative h-44 w-44 flex-shrink-0 outline-none [&_.recharts-wrapper]:outline-none [&_svg]:outline-none [&_svg:focus]:outline-none [&_*]:outline-none">
+      <div className="relative z-10 flex min-h-0 flex-1 items-center gap-3">
+        <div className="relative h-28 w-28 flex-shrink-0 outline-none [&_.recharts-wrapper]:outline-none [&_svg]:outline-none [&_svg:focus]:outline-none [&_*]:outline-none">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart style={{ outline: "none" }}>
               <Pie
                 data={PIPELINE_STAGES}
                 dataKey="value"
                 nameKey="name"
-                innerRadius={54}
-                outerRadius={74}
+                innerRadius={34}
+                outerRadius={48}
                 paddingAngle={3}
                 stroke="none"
                 onClick={(_, index) => {
@@ -421,21 +421,21 @@ function Pipeline_By_Stage() {
           </ResponsiveContainer>
 
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            <p className="text-[9px] font-semibold uppercase tracking-wider text-slate-400">
               {focusLabel}
             </p>
-            <h2 className="text-3xl font-bold tracking-tight text-white">
+            <h2 className="text-xl font-bold tracking-tight text-white leading-none">
               {focusTotal}
             </h2>
             {activeStage && (
-              <p className="text-[11px] font-medium text-sky-300">
+              <p className="text-[10px] font-medium text-sky-300">
                 {((focusTotal / total) * 100).toFixed(0)}% EST.
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col justify-center gap-0.5 overflow-y-auto">
           {PIPELINE_STAGES.map((item) => {
             const pct = (item.value / total) * 100;
             const selected = activeStage === item.name;
@@ -450,7 +450,7 @@ function Pipeline_By_Stage() {
                     prev === item.name ? null : item.name
                   )
                 }
-                className={`rounded-xl px-2.5 py-2 text-left transition-all outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
+                className={`rounded-md px-1.5 py-1 text-left transition-all outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
                   selected
                     ? "bg-white/10"
                     : dimmed
@@ -458,22 +458,22 @@ function Pipeline_By_Stage() {
                       : "hover:bg-white/5"
                 }`}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-1.5">
                     <span
-                      className="h-2.5 w-2.5 flex-shrink-0 rounded-full"
+                      className="h-1.5 w-1.5 flex-shrink-0 rounded-full"
                       style={{ background: item.color }}
                     />
-                    <span className="truncate text-sm font-medium text-slate-200">
+                    <span className="truncate text-xs font-medium text-slate-200">
                       {item.name}
                     </span>
                   </div>
-                  <span className="text-sm font-semibold tabular-nums text-white">
+                  <span className="text-xs font-semibold tabular-nums text-white">
                     {item.value}
                   </span>
                 </div>
 
-                <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/10">
+                <div className="mt-0.5 h-0.5 overflow-hidden rounded-full bg-white/10">
                   <div
                     className="h-full rounded-full transition-all duration-300"
                     style={{

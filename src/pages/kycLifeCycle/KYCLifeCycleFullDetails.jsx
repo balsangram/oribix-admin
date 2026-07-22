@@ -18,15 +18,11 @@ const DOC_LABELS = {
 };
 
 const DOC_STATUSES = [
-  "PENDING",
-  "RECEIVED",
   "APPROVED",
-  "RE-UPLOAD_REQUESTED",
   "REJECTED",
 ];
 
 const VENDOR_STATUSES = [
-  "PENDING_VERIFICATION",
   "APPROVED",
   "REJECTED",
   "SUSPENDED",
@@ -180,6 +176,11 @@ function DocumentCard({ label, docKey, doc, onStatusChange, saving }) {
           onChange={(e) => setDocStatus(e.target.value)}
           className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs font-medium text-slate-700 outline-none focus:border-slate-300 focus:bg-white"
         >
+          {!DOC_STATUSES.includes(docStatus) ? (
+            <option value={docStatus} hidden>
+              {docStatus}
+            </option>
+          ) : null}
           {DOC_STATUSES.map((status) => (
             <option key={status} value={status}>
               {status}
@@ -342,6 +343,11 @@ function KYCLifeCycleFullDetails() {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-800 outline-none focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-100"
             >
+              {!VENDOR_STATUSES.includes(selectedStatus) ? (
+                <option value={selectedStatus} hidden>
+                  {selectedStatus}
+                </option>
+              ) : null}
               {VENDOR_STATUSES.map((status) => (
                 <option key={status} value={status}>
                   {status}

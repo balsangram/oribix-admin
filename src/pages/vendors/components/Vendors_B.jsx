@@ -213,7 +213,7 @@ function Vendors_B() {
   }, [page, search, status, pagination.limit]);
 
   return (
-    <div className="px-6 pb-6">
+    <div className="mt-3">
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div className="flex flex-col gap-3 border-b border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
           <div>

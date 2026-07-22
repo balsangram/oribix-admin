@@ -1,46 +1,28 @@
-import React, { useState } from "react";
-import { Eye, ArrowLeft, Users, ShoppingBag, CheckCircle2, Clock } from "lucide-react";
-
-const customers = [
-  {
-    id: "CUST-1001",
-    name: "Rohan Desai",
-    phone: "+91 98200 11223",
-    code: "ROHAN-VIP",
-    referred: [
-      { name: "Amit Shah", phone: "+91 99100 22110", ordered: true },
-      { name: "Neha Verma", phone: "+91 98111 55221", ordered: true },
-      { name: "Karan Mehta", phone: "+91 90000 33445", ordered: false },
-      { name: "Sana Khan", phone: "+91 91234 67890", ordered: false },
-    ],
-  },
-  {
-    id: "CUST-1002",
-    name: "Priya Nair",
-    phone: "+91 98765 43210",
-    code: "PRIYA-10",
-    referred: [
-      { name: "Vikram Rao", phone: "+91 90909 12121", ordered: true },
-      { name: "Divya Iyer", phone: "+91 93939 45454", ordered: false },
-    ],
-  },
-  {
-    id: "CUST-1003",
-    name: "Arjun Kapoor",
-    phone: "+91 90123 45678",
-    code: "ARJUN-VIP",
-    referred: [
-      { name: "Rahul Jain", phone: "+91 98989 32323", ordered: true },
-      { name: "Meera Pillai", phone: "+91 97777 21212", ordered: true },
-      { name: "Sameer Ali", phone: "+91 96666 10101", ordered: true },
-    ],
-  },
-];
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Eye,
+  Users,
+  ShoppingBag,
+  CheckCircle2,
+  Clock,
+  Loader2,
+  Trash2,
+  X,
+} from "lucide-react";
+import {
+  getCustomerReferrals,
+  getCustomerReferralDetails,
+  deleteCustomer,
+} from "../../../api/admin";
+import { toast } from "../../../components/basicComponents/TostMessage";
+import { SEARCH } from "../../../components/basicComponents/Search";
 
 function StatBox({ icon: Icon, label, value, tone }) {
   return (
     <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4">
-      <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${tone}`}>
+      <span
+        className={`flex h-10 w-10 items-center justify-center rounded-lg ${tone}`}
+      >
         <Icon size={18} />
       </span>
       <div>
@@ -53,99 +35,260 @@ function StatBox({ icon: Icon, label, value, tone }) {
   );
 }
 
-function Referrals_C() {
-  const [selected, setSelected] = useState(null);
+function ReferralDetailModal({ open, loading, detail, onClose }) {
+  if (!open) return null;
 
-  const active = customers.find((c) => c.id === selected);
+  const customer = detail?.customer;
+  const referredUsers = detail?.referredUsers || [];
+  const usedCount =
+    customer?.usersUsedReferralCount ??
+    detail?.pagination?.totalReferred ??
+    referredUsers.length;
+  const orderedCount = referredUsers.filter((r) => r.hasPlacedFirstOrder)
+    .length;
 
-  if (active) {
-    const usedCount = active.referred.length;
-    const orderedCount = active.referred.filter((r) => r.ordered).length;
-
-    return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-gray-200 bg-white p-6 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           type="button"
-          onClick={() => setSelected(null)}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-800"
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+          aria-label="Close"
         >
-          <ArrowLeft size={16} /> Back to customers
+          <X size={20} />
         </button>
 
-        <div className="mt-4">
-          <h2 className="text-lg font-semibold text-slate-900">
-            {active.name}
-          </h2>
-          <p className="text-sm text-slate-500">
-            Referral code · <span className="font-semibold text-slate-700">{active.code}</span>
+        {loading ? (
+          <div className="flex items-center justify-center py-20 text-slate-400">
+            <Loader2 size={24} className="animate-spin" />
+          </div>
+        ) : !customer ? (
+          <p className="py-16 text-center text-sm text-slate-400">
+            Could not load referral details.
           </p>
-        </div>
+        ) : (
+          <>
+            <div className="pr-8">
+              <h2 className="text-lg font-semibold text-slate-900">
+                {customer.name}
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                {customer.mobile || customer.email || "—"}
+                {" · "}
+                Referral code ·{" "}
+                <span className="rounded-md bg-slate-100 px-2 py-0.5 font-semibold text-slate-700">
+                  {customer.myReferralCode || "—"}
+                </span>
+              </p>
+            </div>
 
-        {/* Summary: used referral vs ordered */}
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <StatBox
-            icon={Users}
-            label="Used this referral"
-            value={usedCount}
-            tone="bg-sky-50 text-sky-600"
-          />
-          <StatBox
-            icon={ShoppingBag}
-            label="Already ordered"
-            value={orderedCount}
-            tone="bg-emerald-50 text-emerald-600"
-          />
-        </div>
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <StatBox
+                icon={Users}
+                label="Used this referral"
+                value={usedCount}
+                tone="bg-sky-50 text-sky-600"
+              />
+              <StatBox
+                icon={ShoppingBag}
+                label="Already ordered"
+                value={orderedCount}
+                tone="bg-emerald-50 text-emerald-600"
+              />
+              <StatBox
+                icon={CheckCircle2}
+                label="Total earned"
+                value={`₹${customer.referralStats?.totalEarned ?? 0}`}
+                tone="bg-violet-50 text-violet-600"
+              />
+            </div>
 
-        {/* Referred users table */}
-        <div className="mt-6 overflow-hidden rounded-xl border border-gray-100">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Referred user</th>
-                <th className="px-4 py-3">Used referral</th>
-                <th className="px-4 py-3">Ordered</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {active.referred.map((r, i) => (
-                <tr key={i} className="text-slate-700">
-                  <td className="px-4 py-3">
-                    <p className="font-semibold text-slate-800">{r.name}</p>
-                    <p className="text-xs text-slate-400">{r.phone}</p>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-sky-600">
-                      <CheckCircle2 size={13} /> Yes
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {r.ordered ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-600">
-                        <CheckCircle2 size={13} /> Ordered
-                      </span>
+            <div className="mt-6 overflow-hidden rounded-xl border border-gray-100">
+              <div className="max-h-[360px] overflow-y-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="sticky top-0 bg-gray-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    <tr>
+                      <th className="px-4 py-3">Referred user</th>
+                      <th className="px-4 py-3">Used referral</th>
+                      <th className="px-4 py-3">Ordered</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {referredUsers.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={3}
+                          className="px-4 py-10 text-center text-slate-400"
+                        >
+                          No one has used this referral yet.
+                        </td>
+                      </tr>
                     ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-600">
-                        <Clock size={13} /> Not yet
-                      </span>
+                      referredUsers.map((r) => (
+                        <tr key={r.customerId} className="text-slate-700">
+                          <td className="px-4 py-3">
+                            <p className="font-semibold text-slate-800">
+                              {r.name}
+                            </p>
+                            <p className="text-xs text-slate-400">
+                              {r.mobile || r.email || "—"}
+                            </p>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-sky-600">
+                              <CheckCircle2 size={13} /> Yes
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            {r.hasPlacedFirstOrder ? (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-600">
+                                <CheckCircle2 size={13} /> Ordered
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-600">
+                                <Clock size={13} /> Not yet
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))
                     )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
-  }
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-  // List of all customers
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+              >
+                Close
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Referrals_C() {
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [detail, setDetail] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query.trim());
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const loadCustomers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await getCustomerReferrals({
+        page,
+        limit: 20,
+        search: debouncedQuery || undefined,
+      });
+      const data = res?.data?.data;
+      setCustomers(data?.customers || []);
+      setPagination(data?.pagination || null);
+    } catch (err) {
+      toast.error(err.message || "Failed to load customer referrals");
+      setCustomers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, debouncedQuery]);
+
+  useEffect(() => {
+    loadCustomers();
+  }, [loadCustomers]);
+
+  const openDetail = async (customerId) => {
+    setModalOpen(true);
+    setDetail(null);
+    setDetailLoading(true);
+    try {
+      const res = await getCustomerReferralDetails(customerId, {
+        page: 1,
+        limit: 100,
+      });
+      setDetail(res?.data?.data || null);
+    } catch (err) {
+      toast.error(err.message || "Failed to load referral details");
+      setModalOpen(false);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const closeDetail = () => {
+    setModalOpen(false);
+    setDetail(null);
+  };
+
+  const handleDelete = async (customer) => {
+    const label = customer.name || customer.mobile || "this customer";
+    if (!window.confirm(`Delete customer "${label}"? This cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setDeletingId(customer.customerId);
+      await deleteCustomer(customer.customerId);
+      toast.success("Customer deleted successfully");
+
+      if (customers.length === 1 && page > 1) {
+        setPage((prev) => prev - 1);
+      } else {
+        await loadCustomers();
+      }
+    } catch (err) {
+      toast.error(err.message || "Failed to delete customer");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900">All customers</h2>
-      <p className="text-sm text-slate-500">
-        View who used each customer's referral and how many have ordered.
-      </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">All customers</h2>
+          <p className="text-sm text-slate-500">
+            View who used each customer&apos;s referral and how many have
+            ordered.
+          </p>
+        </div>
+        <div className="w-full max-w-xs">
+          <SEARCH
+            value={query}
+            onChange={setQuery}
+            placeholder="Search name, mobile or code…"
+          />
+        </div>
+      </div>
 
       <div className="mt-5 overflow-hidden rounded-xl border border-gray-100">
         <table className="w-full text-left text-sm">
@@ -158,34 +301,100 @@ function Referrals_C() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {customers.map((c) => (
-              <tr key={c.id} className="text-slate-700">
-                <td className="px-4 py-3">
-                  <p className="font-semibold text-slate-800">{c.name}</p>
-                  <p className="text-xs text-slate-400">{c.phone}</p>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
-                    {c.code}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-sm font-semibold text-slate-800">
-                  {c.referred.length}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <button
-                    type="button"
-                    onClick={() => setSelected(c.id)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800"
-                  >
-                    <Eye size={14} /> View
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan={4} className="px-4 py-10 text-center text-slate-400">
+                  <Loader2 size={20} className="mx-auto animate-spin" />
                 </td>
               </tr>
-            ))}
+            ) : customers.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-4 py-10 text-center text-slate-400">
+                  No customers found.
+                </td>
+              </tr>
+            ) : (
+              customers.map((c) => (
+                <tr key={c.customerId} className="text-slate-700">
+                  <td className="px-4 py-3">
+                    <p className="font-semibold text-slate-800">{c.name}</p>
+                    <p className="text-xs text-slate-400">
+                      {c.mobile || c.email || "—"}
+                    </p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
+                      {c.myReferralCode || "—"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm font-semibold text-slate-800">
+                    {c.usersUsedReferralCount ?? 0}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="inline-flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => openDetail(c.customerId)}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800"
+                      >
+                        <Eye size={14} /> View
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(c)}
+                        disabled={deletingId === c.customerId}
+                        title="Delete customer"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
+                      >
+                        {deletingId === c.customerId ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={14} />
+                        )}
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
+
+      {pagination && pagination.totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between gap-3 text-sm text-slate-500">
+          <span>
+            Page {pagination.page} of {pagination.totalPages} · {pagination.total}{" "}
+            customers
+          </span>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="rounded-lg border border-gray-200 px-3 py-1.5 font-medium hover:bg-slate-50 disabled:opacity-40"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              disabled={page >= pagination.totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="rounded-lg border border-gray-200 px-3 py-1.5 font-medium hover:bg-slate-50 disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
+      <ReferralDetailModal
+        open={modalOpen}
+        loading={detailLoading}
+        detail={detail}
+        onClose={closeDetail}
+      />
     </div>
   );
 }

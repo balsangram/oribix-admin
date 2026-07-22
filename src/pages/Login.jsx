@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 import { M_CARD } from "../components/basicComponents/Card";
 import { H1 } from "../components/basicComponents/Heading";
@@ -16,6 +17,7 @@ function Login() {
   const [trustDevice, setTrustDevice] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -103,14 +105,25 @@ function Login() {
             </SMALL_P>
           </div>
 
-          <INPUT
-            type="password"
-            color="white"
-            placeholder="Enter your password"
-            className="h-12 rounded-xl"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="relative">
+            <INPUT
+              type={showPassword ? "text" : "password"}
+              color="white"
+              placeholder="Enter your password"
+              className="h-12 rounded-xl pr-11"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-200"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
         {/* Options */}

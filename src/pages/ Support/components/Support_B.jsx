@@ -12,10 +12,10 @@ function Support_B() {
   const [channel, setChannel] = useState("All channels");
 
   return (
-    <div>
+    <div className="mt-3">
       {/* Page-level search + filters */}
-      <div className="bg-gray-50 px-6 pt-6">
-        <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm lg:flex-row lg:items-center">
+      <div className="mb-3">
+        <div className="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-2.5 shadow-sm lg:flex-row lg:items-center">
           <SEARCH
             value={query}
             onChange={setQuery}

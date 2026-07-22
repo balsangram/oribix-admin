@@ -4,7 +4,7 @@ const cardSize = {
   big: "w-full min-h-full px-6 py-6",
   medium: "w-[550px] min-auto p-8",
   small: "w-[350px] min-h-[300px] p-6",
-  verySmall: "w-full min-h-[112px] p-5",
+  verySmall: "w-full min-h-[80px] p-3.5",
 };
 
 
@@ -86,10 +86,10 @@ export function VS_CARD({ children, className = "", valueColor = "#0f172a" }) {
       className={`
         ${cardSize.verySmall}
         bg-white
-        rounded-2xl
+        rounded-xl
         border border-gray-200
         transition-all duration-300 ease-in-out
-        hover:-translate-y-1
+        hover:-translate-y-0.5
         ${className}
       `}
       style={{
@@ -113,24 +113,24 @@ export function D_CARD({
   title,
   value,
   change,
-  icon = <ShoppingBag size={20} />,
+  icon = <ShoppingBag size={16} />,
   chart,
   className = "",
 }) {
   return (
     <div
-      className={`w-[280px] h-[130px] bg-white rounded-2xl border border-gray-200 shadow-md p-5 flex justify-between ${className}`}
+      className={`w-full min-w-0 h-[96px] bg-white rounded-xl border border-gray-200 shadow-sm p-3.5 flex justify-between ${className}`}
     >
       <div className="flex flex-col justify-between">
-        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#2F9BF3]">
+        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-[#2F9BF3]">
           {icon}
         </div>
         <div>
-          <h2 className="text-4xl font-bold">{value}</h2>
+          <h2 className="text-2xl font-bold tracking-tight leading-none">{value}</h2>
         </div>
       </div>
       <div className="flex flex-col justify-between items-end">
-        <p className="text-sm uppercase text-gray-500 font-semibold">
+        <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wide">
           {title}
         </p>
 
@@ -168,9 +168,9 @@ export function Demand_Heat_Card({
   return (
     <div
       className={`
-        relative w-full min-h-[88px] p-3
-        rounded-xl border border-black/10
-        flex flex-col justify-between gap-2
+        relative w-full min-h-[64px] p-2
+        rounded-lg border border-black/10
+        flex flex-col justify-between gap-1
         shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]
         transition-all duration-150
         hover:shadow-md hover:scale-[1.02] hover:z-10
@@ -179,9 +179,9 @@ export function Demand_Heat_Card({
       style={{ backgroundColor: bg }}
       title={`${orders} orders`}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-1.5">
         <h3
-          className={`text-[11px] font-semibold leading-snug line-clamp-2 pr-1 ${
+          className={`text-[10px] font-semibold leading-snug line-clamp-2 pr-0.5 ${
             isDark ? "text-white" : "text-gray-900"
           }`}
         >
@@ -190,7 +190,7 @@ export function Demand_Heat_Card({
 
         <span
           className={`
-            shrink-0 min-w-[22px] px-1.5 py-0.5 rounded-md text-[10px] font-bold tabular-nums
+            shrink-0 min-w-[18px] px-1 py-0.5 rounded text-[9px] font-bold tabular-nums
             ${isDark ? "bg-black/25 text-white" : "bg-white/70 text-gray-800"}
           `}
         >
@@ -200,7 +200,7 @@ export function Demand_Heat_Card({
 
       {address ? (
         <p
-          className={`text-[10px] leading-snug line-clamp-2 ${
+          className={`text-[9px] leading-snug line-clamp-2 ${
             isDark ? "text-white/85" : "text-gray-600"
           }`}
         >

@@ -7,8 +7,8 @@ import { Dashboard_C } from "./components/Dashboard_C";
 export default function DashboardView() {
   return (
    <B_CARD>
-   <H1>Network operations</H1>
-   <hr className="mb-6 border-gray-300" />
+   <H1 className="mb-2 text-xl">Network operations</H1>
+   <hr className="mb-4 border-gray-300" />
    <Dashboard_A/>
    <Dashboard_B />
    <Dashboard_C />

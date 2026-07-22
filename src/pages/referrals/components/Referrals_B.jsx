@@ -16,9 +16,9 @@ function Referrals_B() {
     tabs.find((t) => t.id === active)?.Component ?? tabs[0].Component;
 
   return (
-    <div className="min-h-full bg-gray-50 px-6 pb-6">
+    <div className="mt-3">
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+      <div className="flex flex-wrap gap-1.5 border-b border-gray-200 pb-2.5">
         {tabs.map((t) => {
           const Icon = t.icon;
           const isActive = active === t.id;
@@ -27,13 +27,13 @@ function Referrals_B() {
               key={t.id}
               type="button"
               onClick={() => setActive(t.id)}
-              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                 isActive
                   ? "bg-slate-900 text-white"
                   : "bg-white text-slate-600 border border-gray-200 hover:bg-gray-50"
               }`}
             >
-              <Icon size={16} />
+              <Icon size={14} />
               {t.label}
             </button>
           );
@@ -41,7 +41,7 @@ function Referrals_B() {
       </div>
 
       {/* Active section */}
-      <div className="pt-5">
+      <div className="pt-3">
         <ActiveComponent />
       </div>
     </div>

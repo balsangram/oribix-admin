@@ -20,35 +20,17 @@ import {
   deleteSubAdmin,
 } from "../../../api/admin";
 
-// Fallback permission options shown when none are configured in the backend yet.
-const DEFAULT_PERMISSIONS = [
-  "Warehouses & Vendors",
-  "KYC Lifecycle",
-  "Catalog",
-  "Orders",
-  "Returns & Disputes",
-  "Customers",
-  "Drivers & Fleet",
-  "Support Tickets",
-  "Revenue & Margin",
-  "Broadcasts",
-  "Promos & Referrals",
-  "User Management",
-  "Platform Settings",
-];
-
 const EMPTY_FORM = {
   fullName: "",
   email: "",
   mobile: "",
   password: "",
   permissions: [],
-  isActive: true,
 };
 
 function UserManagement_A() {
   const [subAdmins, setSubAdmins] = useState([]);
-  const [permissionOptions, setPermissionOptions] = useState(DEFAULT_PERMISSIONS);
+  const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
 
@@ -58,22 +40,29 @@ function UserManagement_A() {
   const [saving, setSaving] = useState(false);
   const [revealed, setRevealed] = useState({});
   const [deletingId, setDeletingId] = useState(null);
+  const [statusUpdatingId, setStatusUpdatingId] = useState(null);
   const [showFormPassword, setShowFormPassword] = useState(false);
+
+  const permissionGroups = useMemo(() => {
+    const groups = new Map();
+    permissions.forEach((perm) => {
+      const group = perm.group || "GENERAL";
+      if (!groups.has(group)) groups.set(group, []);
+      groups.get(group).push(perm);
+    });
+    return Array.from(groups.entries());
+  }, [permissions]);
 
   const loadData = async () => {
     setLoading(true);
     try {
       const [listRes, permRes] = await Promise.all([
         getSubAdmins({ limit: 100 }),
-        getPermissions().catch(() => null),
+        getPermissions(),
       ]);
 
       setSubAdmins(listRes?.data?.data?.subAdmins || []);
-
-      const perms = permRes?.data?.data || [];
-      if (perms.length) {
-        setPermissionOptions(perms.map((p) => p.name));
-      }
+      setPermissions(permRes?.data?.data || []);
     } catch (err) {
       toast.error(err.message || "Failed to load sub admins");
     } finally {
@@ -109,10 +98,8 @@ function UserManagement_A() {
       fullName: subAdmin.fullName || "",
       email: subAdmin.email || "",
       mobile: subAdmin.mobile || "",
-      // Pre-fill with the stored plain password so it can be viewed/edited
       password: subAdmin.password || "",
       permissions: subAdmin.permissions || [],
-      isActive: subAdmin.isActive ?? true,
     });
     setShowFormPassword(false);
     setModalOpen(true);
@@ -123,12 +110,12 @@ function UserManagement_A() {
     setModalOpen(false);
   };
 
-  const togglePermission = (permission) => {
+  const togglePermission = (permissionName) => {
     setForm((prev) => ({
       ...prev,
-      permissions: prev.permissions.includes(permission)
-        ? prev.permissions.filter((p) => p !== permission)
-        : [...prev.permissions, permission],
+      permissions: prev.permissions.includes(permissionName)
+        ? prev.permissions.filter((p) => p !== permissionName)
+        : [...prev.permissions, permissionName],
     }));
   };
 
@@ -161,7 +148,6 @@ function UserManagement_A() {
       permissions: form.permissions,
     };
     if (form.password) payload.password = form.password;
-    if (editingId) payload.isActive = form.isActive;
 
     try {
       setSaving(true);
@@ -195,35 +181,55 @@ function UserManagement_A() {
     }
   };
 
+  const handleStatusChange = async (subAdmin, nextActive) => {
+    if (Boolean(subAdmin.isActive) === nextActive) return;
+    try {
+      setStatusUpdatingId(subAdmin.subAdminId);
+      await updateSubAdmin(subAdmin.subAdminId, { isActive: nextActive });
+      setSubAdmins((prev) =>
+        prev.map((s) =>
+          s.subAdminId === subAdmin.subAdminId
+            ? { ...s, isActive: nextActive }
+            : s
+        )
+      );
+      toast.success(
+        nextActive ? "Sub admin activated" : "Sub admin deactivated"
+      );
+    } catch (err) {
+      toast.error(err.message || "Failed to update status");
+    } finally {
+      setStatusUpdatingId(null);
+    }
+  };
+
   const toggleReveal = (id) =>
     setRevealed((prev) => ({ ...prev, [id]: !prev[id] }));
 
   return (
-    <div className="min-h-full bg-gray-50 p-6">
-      {/* Header */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white">
-            <Users size={20} />
+    <div className="mt-1">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+            <Users size={16} />
           </span>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">User Management</h1>
-            <p className="text-sm text-slate-500">
-              Manage sub admins and their permissions.
+            <h2 className="text-sm font-semibold text-slate-900">Sub admins</h2>
+            <p className="text-xs text-slate-500">
+              Manage accounts and their permissions.
             </p>
           </div>
         </div>
         <button
           type="button"
           onClick={openCreate}
-          className="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-600"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-sky-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-600"
         >
-          <Plus size={16} /> Add sub admin
+          <Plus size={14} /> Add sub admin
         </button>
       </div>
 
-      {/* Search */}
-      <div className="mb-4 max-w-sm">
+      <div className="mb-3 max-w-sm">
         <SEARCH
           value={query}
           onChange={setQuery}
@@ -231,18 +237,17 @@ function UserManagement_A() {
         />
       </div>
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[820px] text-left text-sm">
-            <thead className="bg-gray-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          <table className="w-full min-w-[820px] text-left text-xs">
+            <thead className="bg-gray-50 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
               <tr>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Mobile</th>
                 <th className="px-4 py-3">Permissions</th>
                 <th className="px-4 py-3">Password</th>
-                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3 text-center">Status</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -309,16 +314,24 @@ function UserManagement_A() {
                         </button>
                       </div>
                     </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        type="button"
+                        disabled={statusUpdatingId === s.subAdminId}
+                        onClick={() => handleStatusChange(s, !s.isActive)}
+                        title={s.isActive ? "Click to set inactive" : "Click to set active"}
+                        aria-label={`Toggle status for ${s.fullName}`}
+                        className={`inline-flex w-[76px] items-center justify-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold transition-colors disabled:cursor-wait disabled:opacity-60 ${
                           s.isActive
-                            ? "bg-emerald-50 text-emerald-600"
-                            : "bg-red-50 text-red-600"
+                            ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                            : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                         }`}
                       >
+                        {statusUpdatingId === s.subAdminId ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : null}
                         {s.isActive ? "Active" : "Inactive"}
-                      </span>
+                      </button>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
@@ -352,12 +365,11 @@ function UserManagement_A() {
         </div>
       </div>
 
-      {/* Add / Edit modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/50 p-4 sm:p-8">
           <form
             onSubmit={handleSubmit}
-            className="relative w-full max-w-xl rounded-2xl border border-gray-200 bg-white p-6 shadow-xl"
+            className="relative w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 shadow-xl"
           >
             <button
               type="button"
@@ -446,45 +458,57 @@ function UserManagement_A() {
               </label>
             </div>
 
-            {/* Permissions */}
             <div className="mt-5">
-              <p className="mb-2 text-xs font-semibold text-slate-600">
-                Permissions
-              </p>
-              <div className="grid grid-cols-1 gap-2 rounded-xl border border-gray-200 p-3 sm:grid-cols-2">
-                {permissionOptions.map((p) => (
-                  <label
-                    key={p}
-                    className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={form.permissions.includes(p)}
-                      onChange={() => togglePermission(p)}
-                      className="h-4 w-4 accent-sky-500"
-                    />
-                    <span className="text-sm text-slate-700">{p}</span>
-                  </label>
-                ))}
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="text-xs font-semibold text-slate-600">Permissions</p>
+                <p className="text-[11px] text-slate-400">
+                  {form.permissions.length} selected · loaded from API
+                </p>
               </div>
+
+              {permissions.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-gray-200 px-4 py-8 text-center text-sm text-slate-400">
+                  No permissions configured yet.
+                </div>
+              ) : (
+                <div className="max-h-[320px] space-y-4 overflow-y-auto rounded-xl border border-gray-200 p-3">
+                  {permissionGroups.map(([group, items]) => (
+                    <div key={group}>
+                      <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        {group}
+                      </p>
+                      <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                        {items.map((perm) => (
+                          <label
+                            key={perm.permissionId || perm.key}
+                            className="flex cursor-pointer items-start gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50"
+                            title={perm.description || perm.route || ""}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={form.permissions.includes(perm.name)}
+                              onChange={() => togglePermission(perm.name)}
+                              className="mt-0.5 h-4 w-4 accent-sky-500"
+                            />
+                            <span>
+                              <span className="block text-sm text-slate-700">
+                                {perm.name}
+                              </span>
+                              {perm.description ? (
+                                <span className="block text-[11px] text-slate-400">
+                                  {perm.description}
+                                </span>
+                              ) : null}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Active toggle (edit only) */}
-            {editingId && (
-              <label className="mt-4 flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.isActive}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, isActive: e.target.checked }))
-                  }
-                  className="h-4 w-4 accent-emerald-500"
-                />
-                <span className="text-sm font-medium text-slate-700">Active</span>
-              </label>
-            )}
-
-            {/* Actions */}
             <div className="mt-6 flex items-center justify-end gap-3">
               <button
                 type="button"

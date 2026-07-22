@@ -40,22 +40,22 @@ function LiveMapView() {
 
   return (
     <B_CARD>
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <div className="mb-1 flex items-center gap-2">
-            <Satellite size={22} className="text-slate-700" />
-            <H1 className="mb-0">Live Map + Replay</H1>
+          <div className="mb-0.5 flex items-center gap-1.5">
+            <Satellite size={18} className="text-slate-700" />
+            <H1 className="mb-0 text-xl">Live Map + Replay</H1>
           </div>
-          <P className="mb-0 text-sm text-slate-500">
+          <P className="mb-0 text-xs text-slate-500">
             Real-time fleet, route playback, layer control & driver telemetry.
           </P>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           {summaryStats.map((stat) => (
             <span
               key={stat.key}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${stat.className}`}
+              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${stat.className}`}
             >
               <span className="tabular-nums">{stat.count}</span>
               {stat.label}
@@ -63,15 +63,15 @@ function LiveMapView() {
           ))}
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+            className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
           >
-            <Download size={14} />
+            <Download size={12} />
             Export
           </button>
         </div>
       </div>
 
-      <div className="flex min-h-[560px] flex-col gap-4 xl:flex-row">
+      <div className="flex min-h-[520px] flex-col gap-3 xl:flex-row">
         <div className="min-w-0 flex-1">
           <LiveMapCanvas
             drivers={filteredDrivers}

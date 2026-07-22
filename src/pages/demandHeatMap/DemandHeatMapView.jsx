@@ -8,11 +8,13 @@ import { B_CARD } from '../../components/basicComponents/Card'
 function DemandHeatMapView() {
   return (
     <B_CARD>
-      <H1>Order Pipeline · all hubs</H1>
-      <P>Drag orders between stages to manually advance · funnel analytics live.</P>
+      <H1 className="text-xl">Order Pipeline · all hubs</H1>
+      <P className="text-sm">Drag orders between stages to manually advance · funnel analytics live.</P>
 
       <OrderPipeLine_A />
-      <OrderPipeLine_B />
+      <div className="mt-3">
+        <OrderPipeLine_B />
+      </div>
     </B_CARD>
   )
 }

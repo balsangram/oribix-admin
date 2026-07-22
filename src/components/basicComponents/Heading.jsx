@@ -11,7 +11,7 @@ export function H1({
 }) {
   return (
     <h1
-      className={`text-2xl font-bold mb-4 ${colors[color]} ${className}`}
+      className={`text-2xl font-bold mb-1 ${colors[color]} ${className}`}
     >
       {children}
     </h1>

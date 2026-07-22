@@ -10,6 +10,8 @@ import { getAdminProfile } from "../api/admin";
 
 const AdminProfileContext = createContext(null);
 
+const FULL_ACCESS_ROLES = new Set(["ADMIN", "SUPER_ADMIN"]);
+
 function readCachedUser() {
   try {
     const raw = localStorage.getItem("user");
@@ -21,6 +23,7 @@ function readCachedUser() {
       mobile: user.mobile || "",
       photo: user.photo || "",
       role: user.role || "",
+      permissions: Array.isArray(user.permissions) ? user.permissions : [],
     };
   } catch {
     return null;
@@ -41,6 +44,9 @@ function persistUser(profile) {
         mobile: profile.mobile,
         photo: profile.photo,
         role: profile.role,
+        permissions: Array.isArray(profile.permissions)
+          ? profile.permissions
+          : [],
       })
     );
   } catch {
@@ -92,6 +98,24 @@ export function AdminProfileProvider({ children }) {
     refreshProfile();
   }, [refreshProfile]);
 
+  const permissions = useMemo(
+    () =>
+      Array.isArray(profile?.permissions) ? profile.permissions : [],
+    [profile]
+  );
+
+  const role = profile?.role || "";
+  const hasFullAccess = FULL_ACCESS_ROLES.has(role);
+
+  const hasPermission = useCallback(
+    (permissionName) => {
+      if (!permissionName) return true;
+      if (hasFullAccess) return true;
+      return permissions.includes(permissionName);
+    },
+    [hasFullAccess, permissions]
+  );
+
   const value = useMemo(
     () => ({
       profile,
@@ -101,12 +125,24 @@ export function AdminProfileProvider({ children }) {
       fullName: profile?.fullName || "Admin",
       email: profile?.email || "",
       mobile: profile?.mobile || "",
-      role: profile?.role || "",
-      roleText: roleLabel(profile?.role),
+      role,
+      roleText: roleLabel(role),
       initials: initialsFromName(profile?.fullName || "Admin"),
       photo: profile?.photo || "",
+      permissions,
+      hasFullAccess,
+      hasPermission,
     }),
-    [profile, loading, setProfile, refreshProfile]
+    [
+      profile,
+      loading,
+      setProfile,
+      refreshProfile,
+      role,
+      permissions,
+      hasFullAccess,
+      hasPermission,
+    ]
   );
 
   return (

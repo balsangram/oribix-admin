@@ -25,7 +25,6 @@ function Referrals_F({ onCancel = () => {}, onCreate = () => {} }) {
   const [firstOrderOnly, setFirstOrderOnly] = useState(true);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [usageLimit, setUsageLimit] = useState(1000);
 
   const handleCreate = () => {
     onCreate({
@@ -35,7 +34,6 @@ function Referrals_F({ onCancel = () => {}, onCreate = () => {} }) {
       scope: firstOrderOnly ? "First order" : "All orders",
       startDate,
       endDate,
-      usageLimit,
     });
   };
 
@@ -88,22 +86,12 @@ function Referrals_F({ onCancel = () => {}, onCreate = () => {} }) {
           <select
             value={audience}
             onChange={(e) => setAudience(e.target.value)}
-            className={`${inputClass} sm:col-span-2`}
+            className={inputClass}
           >
             {audiences.map((a) => (
               <option key={a}>{a}</option>
             ))}
           </select>
-        </Field>
-
-        <Field label="Usage limit">
-          <input
-            type="number"
-            min={0}
-            value={usageLimit}
-            onChange={(e) => setUsageLimit(Number(e.target.value))}
-            className={inputClass}
-          />
         </Field>
       </div>
 

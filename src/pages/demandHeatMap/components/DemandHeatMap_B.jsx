@@ -1,5 +1,5 @@
 import React from "react";
-import { Info, Pause, RefreshCw } from "lucide-react";
+import { Info, RefreshCw } from "lucide-react";
 import {
   Demand_Heat_Card,
   getHeatColor,
@@ -113,7 +113,6 @@ export default function DemandHeatMap_B() {
   const [cards, setCards] = React.useState(() =>
     shuffle(getLatestWarehouses("60m"))
   );
-  const [paused, setPaused] = React.useState(false);
 
   const range = TIME_RANGES.find((r) => r.id === rangeId) ?? TIME_RANGES[0];
 
@@ -123,7 +122,6 @@ export default function DemandHeatMap_B() {
   };
 
   const refresh = () => {
-    if (paused) return;
     setCards(shuffle(getLatestWarehouses(rangeId)));
   };
 
@@ -135,26 +133,26 @@ export default function DemandHeatMap_B() {
   );
 
   return (
-    <div className="w-full rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <div className="w-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
-          <h2 className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+          <h2 className="text-[11px] font-semibold tracking-wide text-gray-400 uppercase">
             Demand Heat-Map — {range.title}
           </h2>
-          <Info className="w-3.5 h-3.5 text-gray-400" />
+          <Info className="w-3 h-3 text-gray-400" />
           <span className="text-[10px] text-gray-400">
             showing {cards.length} / {MAX_CARDS} latest
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <div className="flex items-center rounded-lg bg-[#2A2A2A] p-0.5">
             {TIME_RANGES.map((r) => (
               <button
                 key={r.id}
                 type="button"
                 onClick={() => applyRange(r.id)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
                   rangeId === r.id
                     ? "bg-white text-gray-900"
                     : "text-white/80 hover:text-white"
@@ -167,25 +165,16 @@ export default function DemandHeatMap_B() {
 
           <button
             type="button"
-            onClick={() => setPaused((p) => !p)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2A2A2A] text-white text-xs font-medium"
-          >
-            <Pause className="w-3.5 h-3.5" />
-            {paused ? "Resume" : "Pause"}
-          </button>
-          <button
-            type="button"
             onClick={refresh}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2A2A2A] text-white text-xs font-medium disabled:opacity-50"
-            disabled={paused}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#2A2A2A] text-white text-[11px] font-medium"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <RefreshCw className="w-3 h-3" />
             Refresh
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-9 gap-3 bg-[#F7F7F5] rounded-2xl p-4 border border-gray-100">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-2 bg-[#F7F7F5] rounded-xl p-3 border border-gray-100">
         {cards.map((warehouse) => (
           <Demand_Heat_Card
             key={warehouse.warehouseName}
@@ -196,19 +185,19 @@ export default function DemandHeatMap_B() {
         ))}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-500">
         <div className="flex items-center gap-2">
           <span>{range.from}</span>
           <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
           <span>now</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <span>low</span>
           {HEAT_THRESHOLDS.map((threshold) => (
             <span
               key={threshold}
-              className="w-4 h-4 rounded-sm border border-black/5"
+              className="w-3.5 h-3.5 rounded-sm border border-black/5"
               style={{ backgroundColor: getHeatColor(threshold) }}
               title={`${threshold}${threshold === 15 ? "+" : ""} orders`}
             />

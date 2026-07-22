@@ -88,7 +88,7 @@ function TrendChart() {
             </h2>
           </div>
           <div className="mt-3 flex items-end gap-2">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               ₹1.72Cr
             </h1>
             <span className="mb-1 inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-600">
@@ -322,7 +322,7 @@ function ZoneTable() {
 
 function Finance_B() {
   return (
-    <div className="px-6 pb-8">
+    <div className="mt-3">
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         <TrendChart />
         <CategoryMix />

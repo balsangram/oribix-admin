@@ -24,7 +24,6 @@ const emptyForm = {
   slug: "",
   hsnCode: "",
   gstPercentage: "",
-  isActive: true,
 };
 
 const emptyCreateForm = {
@@ -35,7 +34,6 @@ const emptyCreateForm = {
   hsnCode: "",
   gstPercentage: "",
   description: "",
-  isActive: true,
 };
 
 function Catalog_B() {
@@ -77,6 +75,7 @@ function Catalog_B() {
   const [viewDetails, setViewDetails] = useState(null); // full details with vendors
   const [loadingView, setLoadingView] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [statusUpdatingId, setStatusUpdatingId] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -210,7 +209,7 @@ function Catalog_B() {
       fd.append("name", createForm.name.trim());
       fd.append("categoryId", createForm.categoryId);
       fd.append("brandId", createForm.brandId);
-      fd.append("isActive", createForm.isActive);
+      fd.append("isActive", true);
       if (createForm.subCategoryId) {
         fd.append("subCategoryId", createForm.subCategoryId);
       }
@@ -247,7 +246,6 @@ function Catalog_B() {
       slug: p.slug || "",
       hsnCode: p.hsnCode || "",
       gstPercentage: p.gstPercentage ?? "",
-      isActive: p.isActive ?? true,
     });
     setThumbUrl(p.thumbnail || "");
     setThumbFile(null);
@@ -421,7 +419,6 @@ function Catalog_B() {
       if (form.gstPercentage !== "" && form.gstPercentage !== null) {
         fd.append("gstPercentage", form.gstPercentage);
       }
-      fd.append("isActive", form.isActive);
       if (thumbFile) fd.append("thumbnail", thumbFile);
       fd.append("existingImages", JSON.stringify(existingImages));
       newImages.forEach((n) => fd.append("images", n.file));
@@ -442,17 +439,39 @@ function Catalog_B() {
     }
   };
 
+  const handleStatusChange = async (product, nextActive) => {
+    if (Boolean(product.isActive) === nextActive) return;
+    try {
+      setStatusUpdatingId(product.productId);
+      await updateProduct(product.productId, { isActive: nextActive });
+      setProducts((list) =>
+        list.map((p) =>
+          p.productId === product.productId
+            ? { ...p, isActive: nextActive }
+            : p
+        )
+      );
+      toast.success(
+        nextActive ? "Product activated" : "Product deactivated"
+      );
+    } catch (err) {
+      toast.error(err.message || "Failed to update status");
+    } finally {
+      setStatusUpdatingId(null);
+    }
+  };
+
   return (
-    <div className="min-h-full bg-gray-50 p-6">
+    <div className="mt-3">
       {/* Header */}
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white">
-            <Package size={20} />
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+            <Package size={16} />
           </span>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Products</h1>
-            <p className="text-sm text-slate-500">
+            <h2 className="text-sm font-semibold text-slate-900">Products</h2>
+            <p className="text-xs text-slate-500">
               All products in the catalog{" "}
               {!loading && (
                 <span className="font-medium text-slate-600">
@@ -462,8 +481,8 @@ function Catalog_B() {
             </p>
           </div>
         </div>
-        <div className="flex w-full max-w-xl flex-wrap items-center justify-end gap-3">
-          <div className="min-w-[220px] flex-1">
+        <div className="flex w-full max-w-xl flex-wrap items-center justify-end gap-2">
+          <div className="min-w-[200px] flex-1">
             <SEARCH
               value={query}
               onChange={setQuery}
@@ -473,117 +492,125 @@ function Catalog_B() {
           <button
             type="button"
             onClick={openCreate}
-            className="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-600"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-sky-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-600"
           >
-            <Plus size={16} /> Add Product
+            <Plus size={14} /> Add Product
           </button>
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[960px] text-left text-sm">
-            <thead className="bg-gray-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          <table className="w-full min-w-[960px] text-left text-xs">
+            <thead className="bg-gray-50 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
               <tr>
-                <th className="px-4 py-3">Product</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Brand</th>
-                <th className="px-4 py-3">HSN</th>
-                <th className="px-4 py-3">GST %</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Action</th>
+                <th className="px-3 py-2">Product</th>
+                <th className="px-3 py-2">Category</th>
+                <th className="px-3 py-2">Brand</th>
+                <th className="px-3 py-2">HSN</th>
+                <th className="px-3 py-2">GST %</th>
+                <th className="px-3 py-2 text-center">Status</th>
+                <th className="px-3 py-2 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-slate-400">
-                    <Loader2 size={20} className="mx-auto animate-spin" />
+                  <td colSpan={7} className="px-3 py-8 text-center text-slate-400">
+                    <Loader2 size={18} className="mx-auto animate-spin" />
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-slate-400">
+                  <td colSpan={7} className="px-3 py-8 text-center text-slate-400">
                     No products found.
                   </td>
                 </tr>
               ) : (
                 filtered.map((p) => (
                   <tr key={p.productId} className="text-slate-700">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
+                    <td className="px-3 py-2.5">
+                      <div className="flex items-center gap-2.5">
                         {p.thumbnail ? (
                           <img
                             src={p.thumbnail}
                             alt={p.name}
-                            className="h-10 w-10 rounded-lg object-cover"
+                            className="h-8 w-8 rounded-md object-cover"
                           />
                         ) : (
-                          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-400">
-                            <ImageIcon size={16} />
+                          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-400">
+                            <ImageIcon size={14} />
                           </span>
                         )}
                         <div>
-                          <p className="font-semibold text-slate-800">{p.name}</p>
-                          <p className="text-xs text-slate-400">{p.slug}</p>
+                          <p className="text-sm font-semibold text-slate-800">{p.name}</p>
+                          <p className="text-[11px] text-slate-400">{p.slug}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3">{p.category?.name || "—"}</td>
-                    <td className="px-4 py-3">{p.brand?.name || "—"}</td>
-                    <td className="px-4 py-3">{p.hsnCode || "—"}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2.5">{p.category?.name || "—"}</td>
+                    <td className="px-3 py-2.5">{p.brand?.name || "—"}</td>
+                    <td className="px-3 py-2.5">{p.hsnCode || "—"}</td>
+                    <td className="px-3 py-2.5">
                       {p.gstPercentage != null ? `${p.gstPercentage}%` : "—"}
                     </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                    <td className="px-3 py-2.5 text-center">
+                      <button
+                        type="button"
+                        disabled={statusUpdatingId === p.productId}
+                        onClick={() => handleStatusChange(p, !p.isActive)}
+                        title={p.isActive ? "Click to set inactive" : "Click to set active"}
+                        aria-label={`Toggle status for ${p.name}`}
+                        className={`inline-flex w-[76px] items-center justify-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold transition-colors disabled:cursor-wait disabled:opacity-60 ${
                           p.isActive
-                            ? "bg-emerald-50 text-emerald-600"
-                            : "bg-red-50 text-red-600"
+                            ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                            : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                         }`}
                       >
+                        {statusUpdatingId === p.productId ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : null}
                         {p.isActive ? "Active" : "Inactive"}
-                      </span>
+                      </button>
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
+                    <td className="px-3 py-2.5">
+                      <div className="flex justify-end gap-1.5">
                         <button
                           type="button"
                           onClick={() => openView(p)}
                           title="View details"
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          className="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         >
-                          <Eye size={13} /> View
+                          <Eye size={12} /> View
                         </button>
                         <button
                           type="button"
                           onClick={() => openPricing(p)}
                           title="Bulk pricing"
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          className="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         >
-                          <Layers size={13} /> Bulk Pricing
+                          <Layers size={12} /> Bulk Pricing
                         </button>
                         <button
                           type="button"
                           onClick={() => openEdit(p)}
                           title="Edit product"
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          className="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         >
-                          <Pencil size={13} /> Edit
+                          <Pencil size={12} /> Edit
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(p)}
                           disabled={deletingId === p.productId}
                           title="Delete product"
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
+                          className="inline-flex items-center gap-1 rounded-md border border-red-200 px-2 py-1 text-[11px] font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
                         >
                           {deletingId === p.productId ? (
-                            <Loader2 size={13} className="animate-spin" />
+                            <Loader2 size={12} className="animate-spin" />
                           ) : (
-                            <Trash2 size={13} />
+                            <Trash2 size={12} />
                           )}
                           Delete
                         </button>
@@ -783,17 +810,6 @@ function Catalog_B() {
                     className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm outline-none focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100"
                   />
                 </label>
-
-                <label className="flex items-center gap-2 sm:col-span-2">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={createForm.isActive}
-                    onChange={handleCreateChange}
-                    className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-200"
-                  />
-                  <span className="text-sm font-medium text-slate-700">Active</span>
-                </label>
               </div>
             )}
 
@@ -921,17 +937,6 @@ function Catalog_B() {
                   </div>
                 )}
               </div>
-
-              <label className="flex items-center gap-2 sm:col-span-2">
-                <input
-                  type="checkbox"
-                  name="isActive"
-                  checked={form.isActive}
-                  onChange={handleChange}
-                  className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-200"
-                />
-                <span className="text-sm font-medium text-slate-700">Active</span>
-              </label>
             </div>
 
             <div className="sticky bottom-0 flex justify-end gap-3 border-t border-gray-100 bg-white px-6 py-4">

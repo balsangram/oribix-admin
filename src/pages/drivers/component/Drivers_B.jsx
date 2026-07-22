@@ -36,7 +36,7 @@ function Drivers_B() {
   }, [activeTab, search]);
 
   return (
-    <div className="px-6 pb-6">
+    <div className="mt-3">
       {/* Top bar: search + tabs + view toggle */}
       <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">

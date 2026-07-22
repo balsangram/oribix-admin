@@ -11,7 +11,7 @@ export function P({
   className = "",
 }) {
   return (
-    <p className={`text-base mb-4 ${colors[color]} ${className}`}>
+    <p className={`text-base mb-1 ${colors[color]} ${className}`}>
       {children}
     </p>
   );

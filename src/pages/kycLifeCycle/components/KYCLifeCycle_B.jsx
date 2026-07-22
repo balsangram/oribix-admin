@@ -91,22 +91,22 @@ function KYCLifeCycle_B() {
   };
 
   return (
-    <div className="px-6 pb-6">
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
+    <div className="mt-3">
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-2 border-b border-gray-100 p-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">
+            <h2 className="text-sm font-semibold text-slate-900">
               Vendor applications
             </h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-xs text-slate-500">
               Display all vendor KYC applications except accepted vendors.
             </p>
           </div>
 
-          <div className="relative w-full md:w-80">
+          <div className="relative w-full md:w-72">
             <Search
-              size={16}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              size={14}
+              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
             />
             <input
               value={search}
@@ -115,13 +115,13 @@ function KYCLifeCycle_B() {
                 setPage(1);
               }}
               placeholder="Search vendor, email, mobile, GSTIN..."
-              className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-3 text-sm outline-none transition focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-100"
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 py-1.5 pl-8 pr-2.5 text-xs outline-none transition focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-100"
             />
           </div>
         </div>
 
         {error ? (
-          <div className="m-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="m-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
             {error}
           </div>
         ) : null}
@@ -130,22 +130,22 @@ function KYCLifeCycle_B() {
           <table className="min-w-full divide-y divide-gray-100">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                   Vendor
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                   Business
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                   GSTIN
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                   Applied
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                   Action
                 </th>
               </tr>
@@ -154,49 +154,49 @@ function KYCLifeCycle_B() {
             <tbody className="divide-y divide-gray-100 bg-white">
               {loading ? (
                 <tr>
-                  <td className="px-4 py-8 text-center text-sm text-slate-500" colSpan={6}>
+                  <td className="px-3 py-6 text-center text-xs text-slate-500" colSpan={6}>
                     Loading vendor applications...
                   </td>
                 </tr>
               ) : filteredVendors.length ? (
                 filteredVendors.map((vendor) => (
                   <tr key={vendor.vendorId} className="hover:bg-gray-50">
-                    <td className="px-4 py-4">
-                      <p className="font-medium text-slate-900">{vendor.name || "-"}</p>
-                      <p className="text-xs text-slate-500">
+                    <td className="px-3 py-2.5">
+                      <p className="text-sm font-medium text-slate-900">{vendor.name || "-"}</p>
+                      <p className="text-[11px] text-slate-500">
                         {vendor.email || "-"} · {vendor.mobile || "-"}
                       </p>
                     </td>
-                    <td className="px-4 py-4">
-                      <p className="font-medium text-slate-800">
+                    <td className="px-3 py-2.5">
+                      <p className="text-sm font-medium text-slate-800">
                         {vendor.businessName || vendor.tradeName || "-"}
                       </p>
-                      <p className="text-xs text-slate-500">{vendor.tradeName || "-"}</p>
+                      <p className="text-[11px] text-slate-500">{vendor.tradeName || "-"}</p>
                     </td>
-                    <td className="px-4 py-4 text-sm text-slate-600">
+                    <td className="px-3 py-2.5 text-xs text-slate-600">
                       {vendor.gstin || "-"}
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-3 py-2.5">
                       <span
-                        className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClass(
+                        className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold ${statusClass(
                           vendor.status
                         )}`}
                       >
                         {vendor.status || "-"}
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-sm text-slate-600">
+                    <td className="px-3 py-2.5 text-xs text-slate-600">
                       {formatDate(vendor.createdAt)}
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-3 py-2.5 text-right">
                       <button
                         type="button"
                         onClick={() =>
                           navigate(`/kyc-full-details/${vendor.vendorId}`)
                         }
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+                        className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
                       >
-                        <Eye size={14} />
+                        <Eye size={12} />
                         View
                       </button>
                     </td>
@@ -204,7 +204,7 @@ function KYCLifeCycle_B() {
                 ))
               ) : (
                 <tr>
-                  <td className="px-4 py-8 text-center text-sm text-slate-500" colSpan={6}>
+                  <td className="px-3 py-6 text-center text-xs text-slate-500" colSpan={6}>
                     No pending vendor applications found.
                   </td>
                 </tr>
@@ -213,18 +213,18 @@ function KYCLifeCycle_B() {
           </table>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-gray-100 px-4 py-3 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-2 border-t border-gray-100 px-3 py-2.5 text-xs text-slate-600 md:flex-row md:items-center md:justify-between">
           <span>
             Total: {pagination.total} · Page {pagination.page} of{" "}
             {pagination.totalPages || 1}
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               disabled={page <= 1 || loading}
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-              className="rounded-lg border border-gray-200 px-3 py-1.5 font-medium disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md border border-gray-200 px-2.5 py-1 font-medium disabled:cursor-not-allowed disabled:opacity-50"
             >
               Prev
             </button>
@@ -232,7 +232,7 @@ function KYCLifeCycle_B() {
               type="button"
               disabled={page >= (pagination.totalPages || 1) || loading}
               onClick={() => setPage((prev) => prev + 1)}
-              className="rounded-lg border border-gray-200 px-3 py-1.5 font-medium disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md border border-gray-200 px-2.5 py-1 font-medium disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next
             </button>

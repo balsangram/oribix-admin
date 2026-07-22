@@ -74,6 +74,24 @@ export const updateProduct = (id, payload) => {
 export const deleteProduct = (id) =>
   apiClient.delete(`${BASE}/product/${id}`);
 
+/** CUSTOMER APIs */
+export const deleteCustomer = (id) =>
+  apiClient.delete(`${BASE}/customer/${id}`);
+
+/** CUSTOMER REFERRAL APIs */
+export const getCustomerReferrals = (params) =>
+  apiClient.get(`${BASE}/customer-Refer`, { params });
+
+export const getCustomerReferralDetails = (id, params) =>
+  apiClient.get(`${BASE}/customer-Refer/${id}`, { params });
+
+/** COUPON APIs (admin) */
+export const getCoupons = (params) =>
+  apiClient.get(`${BASE}/coupons`, { params });
+
+export const updateCouponStatus = (id, payload) =>
+  apiClient.patch(`${BASE}/coupon-status/${id}`, payload);
+
 /** PERMISSION APIs */
 export const getPermissions = () => apiClient.get(`${BASE}/permissions`);
 
@@ -105,6 +123,11 @@ const adminApi = {
   createProduct,
   updateProduct,
   deleteProduct,
+  deleteCustomer,
+  getCustomerReferrals,
+  getCustomerReferralDetails,
+  getCoupons,
+  updateCouponStatus,
   getPermissions,
   createPermission,
   updatePermission,

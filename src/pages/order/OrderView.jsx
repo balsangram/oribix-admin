@@ -1,20 +1,20 @@
 import React from "react";
+import { B_CARD } from "../../components/basicComponents/Card";
+import { H1 } from "../../components/basicComponents/Heading";
+import { P } from "../../components/basicComponents/Paragraph";
 import Order_A from "./components/Order_A";
 import Order_B from "./components/Order_B";
 
 function OrderView() {
   return (
-    <div className="min-h-full bg-gray-50">
-      <div className="px-6 pt-6">
-        <h1 className="text-2xl font-bold text-slate-900">Orders</h1>
-        <p className="text-sm text-slate-500">
-          Gross marketplace order ledger · 1,224 orders today · 18 exceptions
-        </p>
-      </div>
-
+    <B_CARD>
+      <H1 className="mb-1 text-xl">Orders</H1>
+      <P className="mb-3 text-sm">
+        Gross marketplace order ledger · 1,224 orders today · 18 exceptions
+      </P>
       <Order_A />
       <Order_B />
-    </div>
+    </B_CARD>
   );
 }
 

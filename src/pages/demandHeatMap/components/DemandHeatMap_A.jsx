@@ -34,22 +34,22 @@ const pipelineData = [
 
 function DemandHeatMap_A() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
       {pipelineData.map((item, index) => (
         <VS_CARD
           key={index}
-          className="flex flex-col justify-center gap-1.5"
+          className="flex flex-col justify-center gap-1"
         >
-          <p className="text-xs text-gray-500 font-medium tracking-wide">
+          <p className="text-[11px] text-gray-500 font-medium tracking-wide">
             {item.title}
           </p>
 
-          <h2 className={`text-3xl font-bold leading-none ${item.valueColor}`}>
+          <h2 className={`text-2xl font-bold leading-none tracking-tight ${item.valueColor}`}>
             {item.value}
           </h2>
 
           {item.subtitle ? (
-            <p className={`text-xs ${item.subtitleColor}`}>{item.subtitle}</p>
+            <p className={`text-[11px] ${item.subtitleColor}`}>{item.subtitle}</p>
           ) : null}
         </VS_CARD>
       ))}
