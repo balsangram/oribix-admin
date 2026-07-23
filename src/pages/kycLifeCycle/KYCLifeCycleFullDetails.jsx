@@ -395,7 +395,7 @@ function KYCLifeCycleFullDetails() {
           <Section title="Business details">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label="Legal business name" value={business.legalBusinessName} />
-              <Field label="Trade name" value={business.tradeName} />
+              {/* <Field label="Trade name" value={business.tradeName} /> */}
               <Field label="Entity type" value={business.entityType} />
               <Field label="GSTIN" value={business.gstin} />
               <Field label="PAN" value={business.pan} />
